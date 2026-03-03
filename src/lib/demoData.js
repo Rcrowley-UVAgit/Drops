@@ -7,7 +7,7 @@ export const demoUsers = {
   freddy: { id: 'freddy', display_name: 'Freddy', color: '#8b5cf6' },
   chuck:  { id: 'chuck',  display_name: 'Chuck',  color: '#10b981' },
   bart:   { id: 'bart',   display_name: 'Bart',   color: '#f97316' },
-  logi:   { id: 'logi',   display_name: 'Logi',   color: '#06b6d4' },
+  logi:   { id: 'logi',   display_name:'Logi',   color: '#06b6d4' },
   pops:   { id: 'pops',   display_name: 'Pops',   color: '#84cc16' },
   mama:   { id: 'mama',   display_name: 'Mama',   color: '#ec4899' },
   johnny: { id: 'johnny', display_name: 'Johnny', color: '#a855f7' },
@@ -79,7 +79,7 @@ export const demoPastDrops = {
   'uw-lads': [
     {
       id: 'drop-uw-1', user_id: 'crow', drop_date: '2026-03-02',
-      song: { title: 'Money Trees', artist: 'Kendrick Lamar', album: 'good kid, m.A.A.d city', spotify_url: 'https://open.spotify.com/track/2HbKqm4o0w5wEeEFXm2s4y', album_art: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02d28d2ebdedb220e479743797' },
+      song: { title: 'Money Trees', artist: 'Kendrick Lamar', album: 'good kid, m.A.A.d city', spotify_url: 'https://open.spotify.com/track/2HbKqm4o0w5wEeEFXm2sD4', album_art: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02d28d2ebdedb220e479743797' },
       caption: 'Ya bish', mood_tag: 'Late Night', submitted_at: '2026-03-02T14:30:00Z',
       reactions: [ { user_id: 'meek', reaction_type: 'classic' }, { user_id: 'morry', reaction_type: 'repeat' }, { user_id: 'freddy', reaction_type: 'listening' }, { user_id: 'bart', reaction_type: 'classic' } ],
       comments: [ { id: 'c10', user_id: 'meek', body: 'This never gets old', created_at: '2026-03-02T15:00:00Z' }, { id: 'c11', user_id: 'bart', body: 'goated pick Crow', created_at: '2026-03-02T16:00:00Z' } ],
