@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Flame, Clock, Music, Search as SearchIcon, ExternalLink, Link2, Check } from 'lucide-react'
+import { Flame, Clock, Music, Search as SearchIcon, ExternalLink, Link2, Check, ChevronDown, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { demoGroups, demoPastDrops, getUser, getGroupMembers, getShotclock, formatTimeAgo, CURRENT_USER } from '../lib/demoData'
 import DropCard from '../components/DropCard'
@@ -12,6 +12,7 @@ export default function GroupPage() {
   const navigate = useNavigate()
   const [shotclock, setShotclock] = useState(getShotclock())
   const [copied, setCopied] = useState(false)
+  const [membersOpen, setMembersOpen] = useState(false)
 
   const group = demoGroups.find(g => g.id === groupId) || demoGroups[0]
   const members = getGroupMembers(group)
@@ -54,31 +55,50 @@ export default function GroupPage() {
         </div>
       </div>
 
-      {/* Members list */}
+      {/* Members dropdown */}
       <div className="px-6 pb-4">
-        <div className="flex items-center gap-2 flex-wrap">
-          {members.map((member) => {
-            const isDropper = member.id === group.today_dropper
-            return (
-              <div
-                key={member.id}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${
-                  isDropper ? 'bg-amber-500/15 ring-1 ring-amber-500/30' : 'bg-white/[0.06]'
-                }`}
-              >
+        <button
+          onClick={() => setMembersOpen(!membersOpen)}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.10] transition-colors"
+        >
+          <Users size={15} className="text-white/60" />
+          <span className="text-base font-medium text-white">Members</span>
+          <span className="text-base text-white/40">{members.length}</span>
+          <ChevronDown
+            size={15}
+            className={`text-white/40 transition-transform duration-200 ${membersOpen ? 'rotate-180' : ''}`}
+          />
+        </button>
+        {membersOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            transition={{ duration: 0.2 }}
+            className="mt-2 flex items-center gap-2 flex-wrap"
+          >
+            {members.map((member) => {
+              const isDropper = member.id === group.today_dropper
+              return (
                 <div
-                  className="w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold"
-                  style={{ backgroundColor: member.color, color: '#000' }}
+                  key={member.id}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${
+                    isDropper ? 'bg-amber-500/15 ring-1 ring-amber-500/30' : 'bg-white/[0.06]'
+                  }`}
                 >
-                  {member.display_name[0]}
+                  <div
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold"
+                    style={{ backgroundColor: member.color, color: '#000' }}
+                  >
+                    {member.display_name[0]}
+                  </div>
+                  <span className={`text-base font-medium ${isDropper ? 'text-amber-400' : 'text-white'}`}>
+                    {member.display_name}
+                  </span>
                 </div>
-                <span className={`text-base font-medium ${isDropper ? 'text-amber-400' : 'text-white'}`}>
-                  {member.display_name}
-                </span>
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+          </motion.div>
+        )}
       </div>
 
       {/* Shotclock — only show when waiting or it's your turn, not after drop */}
