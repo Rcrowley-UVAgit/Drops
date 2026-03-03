@@ -81,10 +81,12 @@ export default function GroupPage() {
         </div>
       </div>
 
-      {/* Shotclock */}
-      <div className="px-6 mb-5">
-        <ShotclockDisplay shotclock={shotclock} />
-      </div>
+      {/* Shotclock — only show when waiting or it's your turn, not after drop */}
+      {group.drop_status !== 'dropped' && (
+        <div className="px-6 mb-5">
+          <ShotclockDisplay shotclock={shotclock} />
+        </div>
+      )}
 
       {/* Main content */}
       <div className="px-6 space-y-6">
@@ -121,7 +123,7 @@ function ShotclockDisplay({ shotclock }) {
   const pad = (n) => String(n).padStart(2, '0')
 
   return (
-    <div className="bg-[#0f0f0f] rounded-2xl p-5 border border-white/[0.06]">
+    <div className="bg-[#1a1a1a] rounded-2xl p-5 border border-white/[0.06]">
       <div className="flex items-center justify-center gap-1 mb-2">
         <Clock size={14} className="text-white/50" />
         <span className="text-base font-semibold uppercase tracking-widest text-white/50">Time Remaining</span>
@@ -200,7 +202,7 @@ function DroppedState({ group }) {
         <span className="text-base font-semibold text-green-400 uppercase tracking-wider">Today's Drop</span>
       </div>
 
-      <div className="relative overflow-hidden rounded-2xl bg-[#0f0f0f] border border-white/[0.06]">
+      <div className="relative overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/[0.12] shadow-lg shadow-black/40">
         <div className="relative aspect-square max-h-80 overflow-hidden">
           {song.album_art ? (
             <img src={song.album_art} alt={song.title} className="w-full h-full object-cover" />
@@ -209,7 +211,7 @@ function DroppedState({ group }) {
               <Music size={64} className="text-white/20" />
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f]/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/40 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-5">
             <h2 className="text-2xl font-bold text-white mb-0.5">{song.title}</h2>
             <p className="text-white/80">{song.artist}</p>

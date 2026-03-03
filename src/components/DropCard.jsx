@@ -32,7 +32,7 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08 }}
-      className="bg-[#0f0f0f] rounded-2xl border border-white/[0.08] overflow-hidden"
+      className="bg-[#1a1a1a] rounded-2xl border border-white/[0.12] overflow-hidden shadow-lg shadow-black/40"
     >
       {/* Top section: album art + song info + dropper */}
       <div className="flex gap-4 p-4">
