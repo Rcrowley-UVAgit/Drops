@@ -32,8 +32,14 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08 }}
-      className="bg-[#1a1a1a] rounded-2xl border border-white/[0.12] overflow-hidden shadow-lg shadow-black/40"
+      className="relative rounded-2xl overflow-hidden"
+      style={{
+        background: `linear-gradient(135deg, ${dropper.color}18 0%, ${dropper.color}08 40%, #1a1a1a 100%)`
+      }}
     >
+      {/* Subtle top accent line in dropper's color */}
+      <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ backgroundColor: dropper.color, opacity: 0.4 }} />
+
       {/* Top section: album art + song info + dropper */}
       <div className="flex gap-4 p-4">
         {/* Album art */}
@@ -76,7 +82,7 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
         </div>
       )}
 
-      {/* Footer: links, reactions, comments — with top border for separation */}
+      {/* Footer: links, reactions, comments */}
       <div className="px-4 pb-4 pt-3 space-y-3 border-t border-white/[0.06]">
         {/* Stream links */}
         <div className="flex items-center gap-2 flex-wrap">

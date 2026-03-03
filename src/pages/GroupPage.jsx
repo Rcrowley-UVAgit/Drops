@@ -114,7 +114,7 @@ export default function GroupPage() {
 function ShotclockDisplay({ shotclock }) {
   if (!shotclock.active) {
     return (
-      <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/[0.06]">
+      <div className="bg-white/[0.04] rounded-xl p-4 text-center">
         <p className="text-base text-white/60">{shotclock.remaining}</p>
       </div>
     )
@@ -123,7 +123,7 @@ function ShotclockDisplay({ shotclock }) {
   const pad = (n) => String(n).padStart(2, '0')
 
   return (
-    <div className="bg-[#1a1a1a] rounded-2xl p-5 border border-white/[0.06]">
+    <div className="bg-[#1a1a1a] rounded-2xl p-5">
       <div className="flex items-center justify-center gap-1 mb-2">
         <Clock size={14} className="text-white/50" />
         <span className="text-base font-semibold uppercase tracking-widest text-white/50">Time Remaining</span>
@@ -158,7 +158,7 @@ function YourTurnState({ group, navigate, shotclock, user }) {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-4"
     >
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/20 via-amber-500/5 to-transparent border border-amber-500/20 p-6">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/20 via-amber-500/5 to-transparent p-6">
         <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl -translate-y-8 translate-x-8" />
         <div className="relative">
           <div className="flex items-center gap-2 mb-2">
@@ -202,7 +202,15 @@ function DroppedState({ group }) {
         <span className="text-base font-semibold text-green-400 uppercase tracking-wider">Today's Drop</span>
       </div>
 
-      <div className="relative overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/[0.12] shadow-lg shadow-black/40">
+      <div
+        className="relative overflow-hidden rounded-2xl"
+        style={{
+          background: `linear-gradient(135deg, ${dropper.color}20 0%, ${dropper.color}08 30%, #1a1a1a 60%)`
+        }}
+      >
+        {/* Top accent line in dropper's color */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] z-10" style={{ backgroundColor: dropper.color, opacity: 0.5 }} />
+
         <div className="relative aspect-square max-h-80 overflow-hidden">
           {song.album_art ? (
             <img src={song.album_art} alt={song.title} className="w-full h-full object-cover" />
@@ -276,7 +284,14 @@ function WaitingState({ group, dropper, shotclock }) {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-4"
     >
-      <div className="relative overflow-hidden rounded-2xl bg-[#0f0f0f] border border-white/[0.06] p-8 text-center">
+      <div
+        className="relative overflow-hidden rounded-2xl p-8 text-center"
+        style={{
+          background: `linear-gradient(135deg, ${dropper.color}18 0%, ${dropper.color}08 40%, #1a1a1a 100%)`
+        }}
+      >
+        {/* Top accent line */}
+        <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ backgroundColor: dropper.color, opacity: 0.4 }} />
         <div className="relative">
           <div className="relative inline-block mb-4">
             <div
