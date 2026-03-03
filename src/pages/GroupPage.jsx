@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Settings, Link2, Check } from 'lucide-react'
-import { isDemoMode } from '../lib/supabase'
+import { supabase, isDemoMode } from '../lib/supabase'
 import { demoGroup, demoDrops, demoUsers } from '../lib/demoData'
 import { useAuth } from '../context/AuthContext'
 import GroupHeader from '../components/GroupHeader'
@@ -16,27 +16,98 @@ export default function GroupPage() {
   const [members, setMembers] = useState([])
   const [copied, setCopied] = useState(false)
   const [isMyTurn, setIsMyTurn] = useState(false)
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     if (isDemoMode) {
-      setGroup(demoGroup)
-      setDrops(demoDrops)
-      setMembers(demoUsers)
-      const currentUserId = demoGroup.cycle_order[demoGroup.cycle_index]
-      setIsMyTurn(currentUserId === user?.id)
+      loadDemoData()
+      return
     }
+    loadRealData()
   }, [user])
 
+  function loadDemoData() {
+    setGroup(demoGroup)
+    setDrops(demoDrops)
+    setMembers(demoUsers)
+    const currentUserId = demoGroup.cycle_order[demoGroup.cycle_index]
+    setIsMyTurn(currentUserId === user?.id)
+    setLoaded(true)
+  }
+
+  async function loadRealData() {
+    try {
+      const { data: memberships } = await supabase
+        .from('group_members')
+        .select('group_id, groups(*)')
+        .eq('user_id', user?.id)
+        .limit(1)
+
+      if (!memberships || memberships.length === 0) {
+        loadDemoData()
+        return
+      }
+
+      const grp = memberships[0].groups
+      setGroup(grp)
+
+      const { data: memberData } = await supabase
+        .from('group_members')
+        .select('user_id, profiles:user_id(id, display_name, avatar_url)')
+        .eq('group_id', grp.id)
+
+      if (memberData) {
+        setMembers(memberData.map(m => m.profiles))
+      }
+
+      const { data: dropData } = await supabase
+        .from('drops')
+        .select('*, songs:song_id(*), profiles:user_id(display_name, avatar_url), reactions(*), comments(*, profiles:user_id(display_name))')
+        .eq('group_id', grp.id)
+        .order('submitted_at', { ascending: false })
+        .limit(10)
+
+      if (dropData && dropData.length > 0) {
+        setDrops(dropData.map(d => ({
+          ...d,
+          song: d.songs,
+          user: { display_name: d.profiles?.display_name, avatar_url: d.profiles?.avatar_url },
+          comments: (d.comments || []).map(c => ({ ...c, user: { display_name: c.profiles?.display_name } })),
+        })))
+      } else {
+        // No drops yet — show demo data for drops
+        setDrops(demoDrops)
+      }
+
+      const cycleOrder = grp.cycle_order || []
+      const currentUserId = cycleOrder[grp.cycle_index || 0]
+      setIsMyTurn(currentUserId === user?.id)
+      setLoaded(true)
+    } catch (err) {
+      console.error('Error loading group:', err)
+      loadDemoData()
+    }
+  }
+
   const handleCopyInvite = () => {
-    navigator.clipboard?.writeText('https://drops.app/join/ABC123')
+    const code = group?.invite_code || 'ABC123'
+    navigator.clipboard?.writeText(`https://musicdrops.netlify.app/join/${code}`)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
-  if (!group) {
+  if (!loaded) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (!group) {
+    return (
+      <div className="p-4 text-center py-12">
+        <p className="text-zinc-500">No group found</p>
       </div>
     )
   }
