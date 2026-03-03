@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { REACTION_TYPES } from '../lib/demoData'
+import { motion } from 'framer-motion'
+import { REACTION_TYPES, CURRENT_USER } from '../lib/demoData'
 
 export default function ReactionBar({ reactions = [], dropId }) {
   const [localReactions, setLocalReactions] = useState(reactions)
@@ -11,38 +11,37 @@ export default function ReactionBar({ reactions = [], dropId }) {
   }))
 
   const handleReaction = (type) => {
-    // Toggle reaction (in real app, this would call Supabase)
-    const existing = localReactions.find(r => r.reaction_type === type && r.user_id === '1')
+    const existing = localReactions.find(r => r.reaction_type === type && r.user_id === CURRENT_USER.id)
     if (existing) {
-      setLocalReactions(prev => prev.filter(r => r.id !== existing.id))
+      setLocalReactions(prev => prev.filter(r => !(r.reaction_type === type && r.user_id === CURRENT_USER.id)))
     } else {
       setLocalReactions(prev => [...prev, {
         id: `temp-${Date.now()}`,
-        user_id: '1',
+        user_id: CURRENT_USER.id,
         reaction_type: type,
       }])
     }
   }
 
   return (
-    <div className="flex gap-1.5 flex-wrap">
+    <div className="flex gap-1 flex-wrap">
       {reactionCounts.map(({ type, emoji, label, count }) => {
-        const isActive = localReactions.some(r => r.reaction_type === type && r.user_id === '1')
+        const isActive = localReactions.some(r => r.reaction_type === type && r.user_id === CURRENT_USER.id)
         return (
           <motion.button
             key={type}
             whileTap={{ scale: 0.9 }}
             onClick={() => handleReaction(type)}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs transition-colors ${
+            className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] transition-all ${
               isActive
-                ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/30'
+                ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/20'
                 : count > 0
-                  ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
-                  : 'bg-zinc-800/50 text-zinc-500 hover:bg-zinc-800'
+                  ? 'bg-white/[0.06] text-zinc-300 hover:bg-white/[0.1]'
+                  : 'bg-white/[0.03] text-zinc-600 hover:bg-white/[0.06] hover:text-zinc-400'
             }`}
             title={label}
           >
-            <span>{emoji}</span>
+            <span className="text-xs">{emoji}</span>
             {count > 0 && <span>{count}</span>}
           </motion.button>
         )

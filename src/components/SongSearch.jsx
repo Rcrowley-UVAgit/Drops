@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Search, Music, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase, isDemoMode } from '../lib/supabase'
-import { demoSearchResults } from '../lib/demoData'
+import { demoSearchResults, formatDuration } from '../lib/demoData'
 
 export default function SongSearch({ onSelect, onClose }) {
   const [query, setQuery] = useState('')
@@ -14,15 +14,13 @@ export default function SongSearch({ onSelect, onClose }) {
       setResults([])
       return
     }
-
     setLoading(true)
 
     if (isDemoMode) {
-      // Filter demo results by query
-      await new Promise(r => setTimeout(r, 300)) // simulate latency
+      await new Promise(r => setTimeout(r, 400))
+      const q = searchQuery.toLowerCase()
       const filtered = demoSearchResults.filter(s =>
-        s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.artist.toLowerCase().includes(searchQuery.toLowerCase())
+        s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q) || s.album.toLowerCase().includes(q)
       )
       setResults(filtered.length > 0 ? filtered : demoSearchResults)
       setLoading(false)
@@ -37,97 +35,98 @@ export default function SongSearch({ onSelect, onClose }) {
       setResults(data?.tracks || [])
     } catch (err) {
       console.error('Search error:', err)
-      setResults([])
+      const q = searchQuery.toLowerCase()
+      const filtered = demoSearchResults.filter(s =>
+        s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q)
+      )
+      setResults(filtered.length > 0 ? filtered : demoSearchResults)
     } finally {
       setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (query) searchSongs(query)
-    }, 300) // debounce
+    const timer = setTimeout(() => { if (query) searchSongs(query) }, 300)
     return () => clearTimeout(timer)
   }, [query, searchSongs])
 
-  const formatDuration = (ms) => {
-    const mins = Math.floor(ms / 60000)
-    const secs = Math.floor((ms % 60000) / 1000)
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
-
   return (
-    <div className="fixed inset-0 bg-zinc-950 z-50 flex flex-col">
-      {/* Search header */}
-      <div className="p-4 space-y-3">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-[#060606]/95 backdrop-blur-xl z-50 flex flex-col"
+    >
+      {/* Header */}
+      <div className="p-5 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-zinc-100">Search Songs</h2>
-          <button onClick={onClose} className="text-zinc-500 hover:text-zinc-300">
-            <X size={24} />
+          <h2 className="text-lg font-bold text-white">Search Songs</h2>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.1] transition-all">
+            <X size={18} />
           </button>
         </div>
         <div className="relative">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by song or artist..."
+            placeholder="What do you want to share?"
             autoFocus
-            className="w-full bg-zinc-800 text-zinc-100 placeholder-zinc-500 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-amber-500/50 text-sm"
+            className="w-full bg-white/[0.06] text-white placeholder-zinc-500 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-amber-500/30 focus:bg-white/[0.08] text-sm transition-all"
           />
         </div>
       </div>
 
       {/* Results */}
-      <div className="flex-1 overflow-y-auto px-4 pb-4">
+      <div className="flex-1 overflow-y-auto px-5 pb-5">
         {loading && (
-          <div className="flex justify-center py-8">
+          <div className="flex justify-center py-12">
             <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
           </div>
         )}
 
         {!loading && query && results.length === 0 && (
-          <div className="text-center py-8 text-zinc-500 text-sm">
-            No results found for "{query}"
+          <div className="text-center py-12 text-zinc-500 text-sm">
+            No results for "{query}"
           </div>
         )}
 
         <AnimatePresence>
           {results.map((song, i) => (
             <motion.button
-              key={song.spotify_track_id || song.id}
+              key={song.id}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
+              transition={{ delay: i * 0.04 }}
               onClick={() => onSelect(song)}
-              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-zinc-800/80 active:bg-zinc-800 transition-colors text-left"
+              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.06] active:bg-white/[0.08] transition-colors text-left group"
             >
-              {song.album_art_url ? (
-                <img src={song.album_art_url} alt={song.title} className="w-12 h-12 rounded-lg object-cover" />
+              {song.album_art ? (
+                <img src={song.album_art} alt={song.title} className="w-12 h-12 rounded-lg object-cover shadow-lg" />
               ) : (
-                <div className="w-12 h-12 rounded-lg bg-zinc-800 flex items-center justify-center">
-                  <Music size={20} className="text-zinc-600" />
+                <div className="w-12 h-12 rounded-lg bg-white/[0.04] flex items-center justify-center">
+                  <Music size={20} className="text-zinc-700" />
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-zinc-100 truncate">{song.title}</p>
+                <p className="text-sm font-medium text-white truncate group-hover:text-amber-400 transition-colors">{song.title}</p>
                 <p className="text-xs text-zinc-500 truncate">{song.artist} · {song.album}</p>
               </div>
-              <span className="text-xs text-zinc-600 shrink-0">
+              <span className="text-[11px] text-zinc-600 font-mono shrink-0">
                 {song.duration_ms ? formatDuration(song.duration_ms) : ''}
               </span>
             </motion.button>
           ))}
         </AnimatePresence>
 
-        {!query && (
-          <div className="text-center py-12 text-zinc-600 text-sm">
-            <Music size={32} className="mx-auto mb-3 text-zinc-700" />
-            Start typing to search for a song
+        {!query && !loading && (
+          <div className="text-center py-16 text-zinc-600">
+            <Music size={36} className="mx-auto mb-3 text-zinc-700" />
+            <p className="text-sm">Search for a song to drop</p>
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }

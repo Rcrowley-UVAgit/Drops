@@ -1,43 +1,51 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { LogOut, Music, Heart, Hash, Moon, Sun } from 'lucide-react'
+import { LogOut, Music, Heart, Hash, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { demoDrops, MOOD_TAGS, REACTION_TYPES } from '../lib/demoData'
+import { demoPastDrops, demoGroups, CURRENT_USER, getUser, MOOD_COLORS, formatTimeAgo } from '../lib/demoData'
 
 export default function Profile() {
   const { user, signOut, updateDisplayName } = useAuth()
   const [editing, setEditing] = useState(false)
   const [nameInput, setNameInput] = useState(user?.display_name || '')
 
-  // Compute stats from demo data
-  const myDrops = demoDrops.filter(d => d.user_id === user?.id)
+  // Gather all drops by this user across all groups
+  const myDrops = useMemo(() => {
+    const drops = []
+    for (const [groupId, groupDrops] of Object.entries(demoPastDrops)) {
+      groupDrops.filter(d => d.user_id === user?.id).forEach(d => {
+        const group = demoGroups.find(g => g.id === groupId)
+        drops.push({ ...d, groupName: group?.name, groupEmoji: group?.emoji })
+      })
+    }
+    return drops.sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))
+  }, [user])
+
   const totalReactions = myDrops.reduce((sum, d) => sum + (d.reactions?.length || 0), 0)
+  const groupCount = demoGroups.filter(g => g.members.includes(user?.id)).length
   const moodCounts = {}
-  myDrops.forEach(d => {
-    if (d.mood_tag) moodCounts[d.mood_tag] = (moodCounts[d.mood_tag] || 0) + 1
-  })
+  myDrops.forEach(d => { if (d.mood_tag) moodCounts[d.mood_tag] = (moodCounts[d.mood_tag] || 0) + 1 })
   const topMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A'
 
   const handleSaveName = () => {
-    if (nameInput.trim()) {
-      updateDisplayName(nameInput.trim())
-    }
+    if (nameInput.trim()) updateDisplayName(nameInput.trim())
     setEditing(false)
   }
 
   return (
-    <div className="p-4 space-y-5">
-      <div className="pt-2">
-        <h1 className="text-2xl font-bold text-zinc-100">Profile</h1>
-      </div>
+    <div className="max-w-lg mx-auto px-6 py-6 space-y-6">
+      <h1 className="text-2xl font-bold text-white tracking-tight">Profile</h1>
 
-      {/* Avatar & name */}
+      {/* Avatar + name */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col items-center gap-3 py-4"
+        className="flex flex-col items-center gap-3 py-6"
       >
-        <div className="w-20 h-20 rounded-full bg-amber-500/20 flex items-center justify-center text-3xl font-bold text-amber-500">
+        <div
+          className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold"
+          style={{ backgroundColor: CURRENT_USER.color + '33', color: CURRENT_USER.color }}
+        >
           {user?.display_name?.[0]?.toUpperCase()}
         </div>
         {editing ? (
@@ -46,20 +54,17 @@ export default function Profile() {
               type="text"
               value={nameInput}
               onChange={(e) => setNameInput(e.target.value)}
-              className="bg-zinc-800 text-zinc-100 rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-amber-500/50 text-sm text-center"
+              className="bg-white/[0.06] text-white rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-amber-500/30 text-sm text-center border border-white/[0.06]"
               autoFocus
               onKeyDown={(e) => e.key === 'Enter' && handleSaveName()}
             />
-            <button
-              onClick={handleSaveName}
-              className="text-xs bg-amber-500 text-zinc-900 px-3 py-1.5 rounded-lg font-medium"
-            >
+            <button onClick={handleSaveName} className="text-xs bg-amber-500 text-black px-3 py-1.5 rounded-lg font-bold">
               Save
             </button>
           </div>
         ) : (
-          <button onClick={() => setEditing(true)} className="group">
-            <p className="text-xl font-bold text-zinc-100 group-hover:text-amber-500 transition-colors">
+          <button onClick={() => setEditing(true)} className="group text-center">
+            <p className="text-xl font-bold text-white group-hover:text-amber-400 transition-colors">
               {user?.display_name}
             </p>
             <p className="text-xs text-zinc-600 mt-0.5">Tap to edit</p>
@@ -68,45 +73,64 @@ export default function Profile() {
       </motion.div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-4 gap-2">
         {[
           { icon: Music, label: 'Drops', value: myDrops.length },
           { icon: Heart, label: 'Reactions', value: totalReactions },
+          { icon: Users, label: 'Groups', value: groupCount },
           { icon: Hash, label: 'Top Mood', value: topMood },
         ].map(({ icon: Icon, label, value }) => (
-          <div key={label} className="bg-zinc-900 rounded-xl p-3 text-center">
-            <Icon size={16} className="text-amber-500 mx-auto mb-1" />
-            <p className="text-lg font-bold text-zinc-100">{value}</p>
-            <p className="text-[10px] text-zinc-500">{label}</p>
+          <div key={label} className="bg-[#0f0f0f] rounded-xl p-3 text-center border border-white/[0.04]">
+            <Icon size={14} className="text-amber-500 mx-auto mb-1.5" />
+            <p className="text-base font-bold text-white">{value}</p>
+            <p className="text-[10px] text-zinc-500 mt-0.5">{label}</p>
           </div>
         ))}
       </div>
 
-      {/* My drops list */}
+      {/* My drops */}
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-zinc-400">My Drops</h3>
-        {myDrops.length > 0 ? myDrops.map((drop) => (
-          <div key={drop.id} className="flex items-center gap-3 bg-zinc-900/50 rounded-xl p-3">
-            {drop.song.album_art_url && (
-              <img src={drop.song.album_art_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
-            )}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm text-zinc-200 truncate">{drop.song.title}</p>
-              <p className="text-xs text-zinc-500">{drop.song.artist}</p>
-            </div>
-            {drop.mood_tag && (
-              <span className="text-[10px] text-zinc-500">{drop.mood_tag}</span>
-            )}
-          </div>
-        )) : (
-          <p className="text-sm text-zinc-600 py-4 text-center">No drops yet</p>
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">My Drops</h3>
+        {myDrops.length > 0 ? myDrops.map((drop, i) => {
+          const moodStyle = MOOD_COLORS[drop.mood_tag] || {}
+          return (
+            <motion.div
+              key={drop.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="flex items-center gap-3 bg-[#0f0f0f] rounded-xl p-3 border border-white/[0.04]"
+            >
+              {drop.song.album_art ? (
+                <img src={drop.song.album_art} alt="" className="w-10 h-10 rounded-lg object-cover" />
+              ) : (
+                <div className="w-10 h-10 rounded-lg bg-white/[0.04] flex items-center justify-center">
+                  <Music size={16} className="text-zinc-700" />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-white truncate">{drop.song.title}</p>
+                <p className="text-xs text-zinc-500 truncate">{drop.song.artist} · {drop.groupEmoji} {drop.groupName}</p>
+              </div>
+              {drop.mood_tag && (
+                <span
+                  className="text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0"
+                  style={{ backgroundColor: moodStyle.bg, color: moodStyle.text }}
+                >
+                  {drop.mood_tag}
+                </span>
+              )}
+            </motion.div>
+          )
+        }) : (
+          <p className="text-sm text-zinc-600 py-8 text-center">No drops yet</p>
         )}
       </div>
 
       {/* Sign out */}
       <button
         onClick={signOut}
-        className="w-full flex items-center justify-center gap-2 text-sm text-red-400 hover:text-red-300 py-3 transition-colors"
+        className="w-full flex items-center justify-center gap-2 text-sm text-red-400/80 hover:text-red-400 py-3 transition-colors"
       >
         <LogOut size={16} />
         Sign Out

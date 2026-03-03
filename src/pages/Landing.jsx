@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Music, ArrowRight, Disc3 } from 'lucide-react'
+import { ArrowRight, Disc3 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { isDemoMode } from '../lib/supabase'
 
@@ -20,44 +20,46 @@ export default function Landing() {
     setLoading(true)
     setError('')
     const { error: authError } = await signInWithMagicLink(email)
-    if (authError) {
-      setError(authError.message)
-    } else {
-      setSent(true)
-    }
+    if (authError) setError(authError.message)
+    else setSent(true)
     setLoading(false)
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen bg-[#060606] flex flex-col items-center justify-center px-6 relative overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
+
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-sm text-center space-y-8"
+        transition={{ duration: 0.7 }}
+        className="w-full max-w-sm text-center space-y-8 relative"
       >
         {/* Logo */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
             className="inline-block"
           >
-            <Disc3 size={64} className="text-amber-500" strokeWidth={1.5} />
+            <Disc3 size={56} className="text-amber-500" strokeWidth={1.5} />
           </motion.div>
-          <h1 className="text-4xl font-bold tracking-tight text-zinc-100">
+          <h1 className="text-5xl font-bold tracking-tighter text-white">
             DROPS
           </h1>
-          <p className="text-zinc-400 text-sm">
+          <p className="text-zinc-500 text-sm tracking-wide">
             One song. One friend. Every day.
           </p>
         </div>
 
-        {/* How it works */}
-        <div className="flex justify-center gap-6 text-xs text-zinc-500">
-          {['Spin', 'Share', 'Discover'].map((step, i) => (
+        {/* Steps */}
+        <div className="flex justify-center gap-8 text-xs text-zinc-500">
+          {['Spin', 'Share', 'React'].map((step, i) => (
             <div key={step} className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-amber-500/15 text-amber-500 flex items-center justify-center text-[10px] font-bold">{i + 1}</span>
+              <span className="w-5 h-5 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center text-[10px] font-bold border border-amber-500/20">
+                {i + 1}
+              </span>
               <span>{step}</span>
             </div>
           ))}
@@ -72,13 +74,13 @@ export default function Landing() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required={!isDemoMode}
-              className="w-full bg-zinc-800 text-zinc-100 placeholder-zinc-500 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-amber-500/50 text-sm"
+              className="w-full bg-white/[0.04] text-white placeholder-zinc-500 rounded-xl px-4 py-3.5 outline-none focus:ring-2 focus:ring-amber-500/30 focus:bg-white/[0.06] text-sm transition-all border border-white/[0.06]"
             />
             {error && <p className="text-red-400 text-xs">{error}</p>}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-amber-500 hover:bg-amber-400 text-zinc-900 font-semibold rounded-xl px-4 py-3 text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl px-4 py-3.5 text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isDemoMode ? 'Enter Demo' : loading ? 'Sending...' : 'Get Magic Link'}
               <ArrowRight size={16} />
@@ -86,20 +88,20 @@ export default function Landing() {
           </form>
         ) : (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="bg-zinc-900 rounded-xl p-6 space-y-2"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white/[0.04] rounded-xl p-6 space-y-2 border border-white/[0.06]"
           >
-            <p className="text-amber-500 font-semibold">Check your email!</p>
+            <p className="text-amber-500 font-semibold">Check your email</p>
             <p className="text-zinc-400 text-sm">
-              We sent a sign-in link to <span className="text-zinc-200">{email}</span>
+              Sign-in link sent to <span className="text-white">{email}</span>
             </p>
           </motion.div>
         )}
 
         {isDemoMode && (
-          <p className="text-xs text-zinc-600">
-            Demo mode — no Supabase configured
+          <p className="text-[11px] text-zinc-600">
+            Demo mode active
           </p>
         )}
       </motion.div>

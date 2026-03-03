@@ -21,14 +21,14 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #09090b;
+  background-color: #060606;
   color: #f4f4f5;
 }
 
+/* Hide scrollbars globally */
 ::-webkit-scrollbar {
   display: none;
 }
-
 body {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -40,4 +40,29 @@ body {
 
 input, textarea {
   font-family: inherit;
+}
+
+/* Sidebar rail */
+.sidebar-rail {
+  background: linear-gradient(180deg, #0a0a0a 0%, #080808 100%);
+}
+
+/* Smooth image loading */
+img {
+  transition: opacity 0.3s ease;
+}
+
+/* Line clamp utility */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }

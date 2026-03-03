@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { supabase, isDemoMode } from '../lib/supabase'
-import { demoUsers } from '../lib/demoData'
+import { CURRENT_USER } from '../lib/demoData'
 
 const AuthContext = createContext({})
 
@@ -10,13 +10,11 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (isDemoMode) {
-      // In demo mode, auto-login as first user
-      setUser(demoUsers[0])
+      setUser(CURRENT_USER)
       setLoading(false)
       return
     }
 
-    // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser({
@@ -32,7 +30,6 @@ export function AuthProvider({ children }) {
       setLoading(false)
     })
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUser({
@@ -51,7 +48,7 @@ export function AuthProvider({ children }) {
 
   const signInWithMagicLink = async (email) => {
     if (isDemoMode) {
-      setUser(demoUsers[0])
+      setUser(CURRENT_USER)
       return { error: null }
     }
     const { error } = await supabase.auth.signInWithOtp({ email })
