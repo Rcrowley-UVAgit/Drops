@@ -56,7 +56,7 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
             </div>
             {mood_tag && (
               <span
-                className="text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0"
+                className="text-xs px-2 py-0.5 rounded-full font-medium shrink-0"
                 style={{ backgroundColor: moodStyle.bg, color: moodStyle.text }}
               >
                 {mood_tag}
@@ -67,14 +67,14 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
           {/* Dropper + time */}
           <div className="flex items-center gap-1.5 mt-1.5">
             <div
-              className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold"
+              className="w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold"
               style={{ backgroundColor: dropper.color, color: '#000' }}
             >
               {dropper.display_name[0]}
             </div>
-            <span className="text-[11px] text-zinc-400">{dropper.display_name}</span>
-            <span className="text-[11px] text-zinc-600">·</span>
-            <span className="text-[11px] text-zinc-600">{formatTimeAgo(drop.submitted_at)}</span>
+            <span className="text-xs text-zinc-400">{dropper.display_name}</span>
+            <span className="text-xs text-zinc-600">·</span>
+            <span className="text-xs text-zinc-600">{formatTimeAgo(drop.submitted_at)}</span>
           </div>
 
           {/* Caption */}
@@ -86,24 +86,35 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
 
       {/* Footer: links, reactions, comments */}
       <div className="px-4 pb-3 space-y-2.5">
-        {/* Stream link */}
-        {song.spotify_url && (
+        {/* Stream links */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {song.spotify_url && (
+            <a
+              href={song.spotify_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm bg-[#1DB954] text-white px-5 py-2.5 rounded-full font-bold hover:bg-[#17a34a] transition-colors"
+            >
+              <ExternalLink size={14} />
+              Spotify
+            </a>
+          )}
           <a
-            href={song.spotify_url}
+            href={`https://music.apple.com/us/search?term=${encodeURIComponent(song.title + ' ' + song.artist)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-[11px] bg-[#1DB954]/10 text-[#1DB954] px-2.5 py-1 rounded-full font-medium hover:bg-[#1DB954]/20 transition-colors"
+            className="inline-flex items-center gap-2 text-sm bg-[#fc3c44] text-white px-5 py-2.5 rounded-full font-bold hover:bg-[#e0353d] transition-colors"
           >
-            <ExternalLink size={10} />
-            Spotify
+            <ExternalLink size={14} />
+            Apple Music
           </a>
-        )}
+        </div>
 
         <ReactionBar reactions={reactions} dropId={drop.id} />
 
         <button
           onClick={() => setShowComments(!showComments)}
-          className="flex items-center gap-1.5 text-[11px] text-zinc-500 hover:text-zinc-300 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
         >
           <MessageCircle size={12} />
           {comments.length > 0 ? `${comments.length} comment${comments.length > 1 ? 's' : ''}` : 'Comment'}

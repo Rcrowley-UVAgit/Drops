@@ -57,7 +57,7 @@ export default function Landing() {
         <div className="flex justify-center gap-8 text-xs text-zinc-500">
           {['Spin', 'Share', 'React'].map((step, i) => (
             <div key={step} className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center text-[10px] font-bold border border-amber-500/20">
+              <span className="w-5 h-5 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs font-bold border border-amber-500/20">
                 {i + 1}
               </span>
               <span>{step}</span>
@@ -100,7 +100,7 @@ export default function Landing() {
         )}
 
         {isDemoMode && (
-          <p className="text-[11px] text-zinc-600">
+          <p className="text-xs text-zinc-600">
             Demo mode active
           </p>
         )}

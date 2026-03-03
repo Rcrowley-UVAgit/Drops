@@ -113,7 +113,7 @@ export default function SongSearch({ onSelect, onClose }) {
                 <p className="text-sm font-medium text-white truncate group-hover:text-amber-400 transition-colors">{song.title}</p>
                 <p className="text-xs text-zinc-500 truncate">{song.artist} · {song.album}</p>
               </div>
-              <span className="text-[11px] text-zinc-600 font-mono shrink-0">
+              <span className="text-xs text-zinc-600 font-mono shrink-0">
                 {song.duration_ms ? formatDuration(song.duration_ms) : ''}
               </span>
             </motion.button>

@@ -33,17 +33,17 @@ export default function Comments({ comments = [], dropId }) {
             className="flex gap-2"
           >
             <div
-              className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold shrink-0"
+              className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
               style={{ backgroundColor: commenter.color + '33', color: commenter.color }}
             >
               {commenter.display_name[0]}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-baseline gap-1.5">
-                <span className="text-[11px] font-semibold text-zinc-300">{commenter.display_name}</span>
-                <span className="text-[10px] text-zinc-600">{formatTimeAgo(comment.created_at)}</span>
+                <span className="text-xs font-semibold text-zinc-300">{commenter.display_name}</span>
+                <span className="text-xs text-zinc-600">{formatTimeAgo(comment.created_at)}</span>
               </div>
-              <p className="text-[11px] text-zinc-400 break-words">{comment.body}</p>
+              <p className="text-xs text-zinc-400 break-words">{comment.body}</p>
             </div>
           </motion.div>
         )
@@ -54,7 +54,7 @@ export default function Comments({ comments = [], dropId }) {
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Add a comment..."
-          className="flex-1 bg-white/[0.04] text-[11px] text-zinc-200 placeholder-zinc-600 rounded-full px-3 py-1.5 outline-none focus:ring-1 focus:ring-amber-500/30"
+          className="flex-1 bg-white/[0.04] text-xs text-zinc-200 placeholder-zinc-600 rounded-full px-3 py-1.5 outline-none focus:ring-1 focus:ring-amber-500/30"
         />
         <button
           type="submit"

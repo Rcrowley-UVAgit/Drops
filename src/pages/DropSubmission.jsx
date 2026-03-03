@@ -111,7 +111,7 @@ export default function DropSubmission() {
                 <p className="text-lg font-bold text-white">{selectedSong.title}</p>
                 <p className="text-sm text-zinc-300">{selectedSong.artist} · {selectedSong.album}</p>
               </div>
-              <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm rounded-full px-2.5 py-1 text-[10px] text-zinc-300 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm rounded-full px-2.5 py-1 text-xs text-zinc-300 opacity-0 group-hover:opacity-100 transition-opacity">
                 Change song
               </div>
             </div>
@@ -135,7 +135,7 @@ export default function DropSubmission() {
             rows={2}
             className="w-full bg-white/[0.04] text-white placeholder-zinc-600 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-amber-500/30 focus:bg-white/[0.06] text-sm resize-none transition-all border border-white/[0.06]"
           />
-          <p className="text-right text-[10px] text-zinc-600">{caption.length}/140</p>
+          <p className="text-right text-xs text-zinc-600">{caption.length}/140</p>
         </div>
 
         {/* Mood tags */}

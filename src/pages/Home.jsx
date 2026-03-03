@@ -240,7 +240,7 @@ export default function Home() {
             </div>
             <div className="text-right shrink-0">
               <p className="text-xs text-zinc-500">{drop.user?.display_name}</p>
-              <p className="text-[10px] text-zinc-600">{drop.mood_tag}</p>
+              <p className="text-xs text-zinc-600">{drop.mood_tag}</p>
             </div>
           </button>
         ))}

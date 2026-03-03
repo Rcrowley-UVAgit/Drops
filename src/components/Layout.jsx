@@ -42,7 +42,7 @@ export default function Layout({ children }) {
               }`}
             >
               <Icon size={20} strokeWidth={isActive ? 2.5 : 1.5} />
-              <span className="text-[10px] font-medium">{label}</span>
+              <span className="text-xs font-medium">{label}</span>
             </button>
           )
         })}
