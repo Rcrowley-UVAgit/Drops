@@ -25,14 +25,14 @@ export default function ReactionBar({ reactions = [], dropId }) {
 
   return (
     <div className="flex gap-1 flex-wrap">
-      {reactionCounts.map(({ type, emoji, label, count }) => {
+      {reactionCounts.map(({ type, label, count }) => {
         const isActive = localReactions.some(r => r.reaction_type === type && r.user_id === CURRENT_USER.id)
         return (
           <motion.button
             key={type}
             whileTap={{ scale: 0.9 }}
             onClick={() => handleReaction(type)}
-            className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] transition-all ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
               isActive
                 ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/20'
                 : count > 0
@@ -41,7 +41,7 @@ export default function ReactionBar({ reactions = [], dropId }) {
             }`}
             title={label}
           >
-            <span className="text-xs">{emoji}</span>
+            <span>{label}</span>
             {count > 0 && <span>{count}</span>}
           </motion.button>
         )

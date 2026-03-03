@@ -15,7 +15,7 @@ export default function Profile() {
     for (const [groupId, groupDrops] of Object.entries(demoPastDrops)) {
       groupDrops.filter(d => d.user_id === user?.id).forEach(d => {
         const group = demoGroups.find(g => g.id === groupId)
-        drops.push({ ...d, groupName: group?.name, groupEmoji: group?.emoji })
+        drops.push({ ...d, groupName: group?.name })
       })
     }
     return drops.sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))
@@ -110,7 +110,7 @@ export default function Profile() {
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">{drop.song.title}</p>
-                <p className="text-xs text-zinc-500 truncate">{drop.song.artist} · {drop.groupEmoji} {drop.groupName}</p>
+                <p className="text-xs text-zinc-500 truncate">{drop.song.artist} · {drop.groupName}</p>
               </div>
               {drop.mood_tag && (
                 <span

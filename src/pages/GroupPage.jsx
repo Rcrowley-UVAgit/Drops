@@ -35,13 +35,10 @@ export default function GroupPage() {
     <div className="max-w-2xl mx-auto">
       {/* Group Header */}
       <div className="px-6 pt-6 pb-4">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <div>
-            <div className="flex items-center gap-2.5">
-              <span className="text-2xl">{group.emoji}</span>
-              <h1 className="text-2xl font-bold text-white tracking-tight">{group.name}</h1>
-            </div>
-            <p className="text-sm text-zinc-500 mt-0.5 ml-10">{group.description}</p>
+            <h1 className="text-2xl font-bold text-white tracking-tight">{group.name}</h1>
+            <p className="text-sm text-zinc-500 mt-0.5">{group.description}</p>
           </div>
           <button
             onClick={handleCopyInvite}
@@ -52,7 +49,7 @@ export default function GroupPage() {
           </button>
         </div>
 
-        {/* Stats row */}
+        {/* Compact stats */}
         <div className="flex items-center gap-4 text-xs text-zinc-500">
           <span className="flex items-center gap-1">
             <Users size={12} />
@@ -64,65 +61,17 @@ export default function GroupPage() {
               {group.streak_count} day streak
             </span>
           )}
-          <span>Cycle {group.cycle_index}/{members.length}</span>
-        </div>
-
-        {/* Member avatars */}
-        <div className="flex items-center gap-1 mt-3">
-          {members.map((member, i) => {
-            const isCurrent = member.id === group.today_dropper
-            const hasGone = i < group.cycle_index
-            return (
-              <div
-                key={member.id}
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
-                  isCurrent
-                    ? 'ring-2 ring-amber-500 ring-offset-1 ring-offset-[#060606] scale-110'
-                    : ''
-                }`}
-                style={{
-                  backgroundColor: isCurrent ? member.color : hasGone ? '#27272a' : '#18181b',
-                  color: isCurrent ? '#000' : hasGone ? '#52525b' : '#a1a1aa',
-                }}
-                title={`${member.display_name}${isCurrent ? ' (today)' : ''}`}
-              >
-                {member.display_name[0]}
-              </div>
-            )
-          })}
         </div>
       </div>
 
-      {/* Shotclock bar */}
-      <div className="px-6 mb-4">
-        <div className="flex items-center justify-between text-[11px] text-zinc-500 mb-1.5">
-          <span className="flex items-center gap-1">
-            <Clock size={10} />
-            {shotclock.active ? 'Shotclock' : shotclock.remaining}
-          </span>
-          {shotclock.active && (
-            <span className="font-mono text-zinc-400">{shotclock.remaining}</span>
-          )}
-        </div>
-        <div className="h-[3px] bg-white/[0.06] rounded-full overflow-hidden">
-          <motion.div
-            className="h-full rounded-full"
-            style={{
-              background: shotclock.progress > 0.8
-                ? 'linear-gradient(90deg, #f59e0b, #ef4444)'
-                : 'linear-gradient(90deg, #f59e0b, #fbbf24)',
-              width: `${Math.max(shotclock.progress * 100, 1)}%`,
-            }}
-            initial={false}
-            animate={{ width: `${Math.max(shotclock.progress * 100, 1)}%` }}
-            transition={{ duration: 1 }}
-          />
-        </div>
+      {/* Shotclock — prominent countdown */}
+      <div className="px-6 mb-5">
+        <ShotclockDisplay shotclock={shotclock} />
       </div>
 
       {/* Main content — different for each state */}
       <div className="px-6 space-y-6">
-        {group.drop_status === 'your_turn' && <YourTurnState group={group} navigate={navigate} shotclock={shotclock} />}
+        {group.drop_status === 'your_turn' && <YourTurnState group={group} navigate={navigate} shotclock={shotclock} user={user} />}
         {group.drop_status === 'dropped' && <DroppedState group={group} />}
         {group.drop_status === 'waiting' && <WaitingState group={group} dropper={dropper} shotclock={shotclock} />}
 
@@ -140,8 +89,48 @@ export default function GroupPage() {
   )
 }
 
+// ─── Shotclock Display ───────────────────────────────────────
+function ShotclockDisplay({ shotclock }) {
+  if (!shotclock.active) {
+    return (
+      <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/[0.06]">
+        <p className="text-sm text-zinc-500">{shotclock.remaining}</p>
+      </div>
+    )
+  }
+
+  const pad = (n) => String(n).padStart(2, '0')
+
+  return (
+    <div className="bg-[#0f0f0f] rounded-2xl p-5 border border-white/[0.06]">
+      <div className="flex items-center justify-center gap-1 mb-2">
+        <Clock size={13} className="text-zinc-500" />
+        <span className="text-[11px] font-semibold uppercase tracking-widest text-zinc-500">Time Remaining</span>
+      </div>
+      <div className="flex items-center justify-center gap-3">
+        <TimeUnit value={pad(shotclock.hours)} label="HR" />
+        <span className="text-2xl font-light text-zinc-600 -mt-3">:</span>
+        <TimeUnit value={pad(shotclock.minutes)} label="MIN" />
+        <span className="text-2xl font-light text-zinc-600 -mt-3">:</span>
+        <TimeUnit value={pad(shotclock.seconds)} label="SEC" />
+      </div>
+    </div>
+  )
+}
+
+function TimeUnit({ value, label }) {
+  return (
+    <div className="text-center">
+      <p className="text-3xl font-bold text-white font-mono tracking-wider">{value}</p>
+      <p className="text-[9px] font-semibold uppercase tracking-widest text-zinc-600 mt-0.5">{label}</p>
+    </div>
+  )
+}
+
 // ─── STATE: Your Turn ─────────────────────────────────────────
-function YourTurnState({ group, navigate, shotclock }) {
+function YourTurnState({ group, navigate, shotclock, user }) {
+  const displayName = user?.display_name || 'You'
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -155,9 +144,9 @@ function YourTurnState({ group, navigate, shotclock }) {
             <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
             <span className="text-xs font-semibold text-amber-500 uppercase tracking-wider">Your Turn</span>
           </div>
-          <h2 className="text-xl font-bold text-white mb-1">It's your day to drop</h2>
+          <h2 className="text-xl font-bold text-white mb-1">{displayName}, it's your day to drop</h2>
           <p className="text-sm text-zinc-400 mb-5">
-            Search for a song and share it with the group{shotclock.active ? ` — ${shotclock.remaining} left` : ''}.
+            Search for a song and share it with the group.
           </p>
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -169,13 +158,6 @@ function YourTurnState({ group, navigate, shotclock }) {
             Search & Drop
           </motion.button>
         </div>
-      </div>
-
-      {/* How sharing works note */}
-      <div className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.06]">
-        <p className="text-xs text-zinc-500 leading-relaxed">
-          <span className="text-zinc-300 font-medium">How it works:</span> Search for a song on Spotify, add a caption and mood tag, then share it with your group. Everyone gets until midnight to react and comment.
-        </p>
       </div>
     </motion.div>
   )
@@ -297,17 +279,12 @@ function WaitingState({ group, dropper, shotclock }) {
           <h2 className="text-lg font-bold text-white mb-1">
             Waiting for {dropper.display_name}
           </h2>
-          <p className="text-sm text-zinc-500 mb-4">
+          <p className="text-sm text-zinc-500">
             {shotclock.active
               ? `${shotclock.remaining} left on the clock`
               : shotclock.remaining
             }
           </p>
-
-          <div className="inline-flex items-center gap-1.5 text-xs text-zinc-600 bg-white/[0.03] px-3 py-1.5 rounded-full">
-            <Clock size={10} />
-            Chosen at 8:00 AM PST today
-          </div>
         </div>
       </div>
     </motion.div>

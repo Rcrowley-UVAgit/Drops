@@ -13,12 +13,12 @@ export default function Vault() {
     const drops = []
     for (const [groupId, groupDrops] of Object.entries(demoPastDrops)) {
       const group = demoGroups.find(g => g.id === groupId)
-      groupDrops.forEach(d => drops.push({ ...d, groupId, groupName: group?.name, groupEmoji: group?.emoji }))
+      groupDrops.forEach(d => drops.push({ ...d, groupId, groupName: group?.name }))
     }
     // Also add today's drop from Fam
     const famGroup = demoGroups.find(g => g.id === 'fam')
     if (famGroup?.today_drop) {
-      drops.push({ ...famGroup.today_drop, groupId: 'fam', groupName: 'Fam', groupEmoji: '🏠' })
+      drops.push({ ...famGroup.today_drop, groupId: 'fam', groupName: 'Fam' })
     }
     return drops.sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))
   }, [])
@@ -56,7 +56,7 @@ export default function Vault() {
       <div className="flex gap-2">
         <FilterPill label="All" active={activeGroup === 'all'} onClick={() => setActiveGroup('all')} />
         {demoGroups.map(g => (
-          <FilterPill key={g.id} label={`${g.emoji} ${g.name}`} active={activeGroup === g.id} onClick={() => setActiveGroup(g.id)} />
+          <FilterPill key={g.id} label={g.name} active={activeGroup === g.id} onClick={() => setActiveGroup(g.id)} />
         ))}
       </div>
 
@@ -118,10 +118,10 @@ export default function Vault() {
               <DropperBadge userId={selectedDrop.user_id} />
               <span>·</span>
               <span>{formatTimeAgo(selectedDrop.submitted_at)}</span>
-              {selectedDrop.groupEmoji && (
+              {selectedDrop.groupName && (
                 <>
                   <span>·</span>
-                  <span>{selectedDrop.groupEmoji} {selectedDrop.groupName}</span>
+                  <span>{selectedDrop.groupName}</span>
                 </>
               )}
               {selectedDrop.mood_tag && (

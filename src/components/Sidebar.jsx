@@ -40,7 +40,13 @@ export default function Sidebar() {
                     : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
-                <span className="text-base leading-none">{group.emoji}</span>
+                <div
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                    isActive ? 'bg-amber-500/20 text-amber-400' : 'bg-white/[0.06] text-zinc-400'
+                  }`}
+                >
+                  {group.name[0]}
+                </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] font-medium truncate">{group.name}</p>
                   <p className="text-[10px] text-zinc-500 truncate">{members.length} members</p>

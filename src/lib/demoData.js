@@ -1,7 +1,7 @@
 // ─── Demo Users ───────────────────────────────────────────────
-// "Meek" is the logged-in demo user
+// "Lucas" is the logged-in demo user
 export const demoUsers = {
-  meek:   { id: 'meek',   display_name: 'Meek',   color: '#f59e0b' },
+  meek:   { id: 'meek',   display_name: 'Lucas',  color: '#f59e0b' },
   crow:   { id: 'crow',   display_name: 'Crow',   color: '#3b82f6' },
   morry:  { id: 'morry',  display_name: 'Morry',  color: '#ef4444' },
   freddy: { id: 'freddy', display_name: 'Freddy', color: '#8b5cf6' },
@@ -20,7 +20,6 @@ export const demoGroups = [
   {
     id: 'uw-lads',
     name: 'UW Lads',
-    emoji: '🏈',
     members: ['crow', 'meek', 'morry', 'freddy', 'chuck', 'bart'],
     today_dropper: 'meek',
     drop_status: 'your_turn',
@@ -32,7 +31,6 @@ export const demoGroups = [
   {
     id: 'fam',
     name: 'Fam',
-    emoji: '🏠',
     members: ['meek', 'logi', 'pops', 'mama'],
     today_dropper: 'pops',
     drop_status: 'dropped',
@@ -69,7 +67,6 @@ export const demoGroups = [
   {
     id: 'beta',
     name: 'Beta',
-    emoji: '🧪',
     members: ['meek', 'johnny'],
     today_dropper: 'johnny',
     drop_status: 'waiting',
@@ -157,11 +154,11 @@ export const MOOD_COLORS = {
 };
 
 export const REACTION_TYPES = [
-  { type: 'listening', emoji: '🎧', label: 'Listening' },
-  { type: 'adding',    emoji: '➕', label: 'Adding' },
-  { type: 'repeat',    emoji: '🔁', label: 'On Repeat' },
-  { type: 'new',       emoji: '🌟', label: 'New to Me' },
-  { type: 'classic',   emoji: '👑', label: 'Classic' },
+  { type: 'listening', label: 'Listening' },
+  { type: 'adding',    label: 'Adding' },
+  { type: 'repeat',    label: 'On Repeat' },
+  { type: 'new',       label: 'New to Me' },
+  { type: 'classic',   label: 'Classic' },
 ];
 
 // ─── Shotclock Utility ────────────────────────────────────────
