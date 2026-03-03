@@ -1,15 +1,14 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { MessageCircle, ExternalLink, Music } from 'lucide-react'
-import { getUser, formatTimeAgo, MOOD_COLORS } from '../lib/demoData'
+import { getUser, formatTimeAgo } from '../lib/demoData'
 import ReactionBar from './ReactionBar'
 import Comments from './Comments'
 
 export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
   const [showComments, setShowComments] = useState(false)
-  const { song, caption, mood_tag, reactions = [], comments = [] } = drop
+  const { song, caption, reactions = [], comments = [] } = drop
   const dropper = getUser(drop.user_id)
-  const moodStyle = MOOD_COLORS[mood_tag] || {}
 
   // If reactionsOnly, just show reactions and comments inline (used in GroupPage DroppedState)
   if (reactionsOnly) {
@@ -50,19 +49,9 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
 
         {/* Song info */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <h4 className="text-base font-bold text-white truncate">{song.title}</h4>
-              <p className="text-base text-white/70 truncate">{song.artist}</p>
-            </div>
-            {mood_tag && (
-              <span
-                className="text-base px-2.5 py-0.5 rounded-full font-medium shrink-0"
-                style={{ backgroundColor: moodStyle.bg, color: moodStyle.text }}
-              >
-                {mood_tag}
-              </span>
-            )}
+          <div className="min-w-0">
+            <h4 className="text-base font-bold text-white truncate">{song.title}</h4>
+            <p className="text-base text-white/70 truncate">{song.artist}</p>
           </div>
 
           {/* Dropper + time */}

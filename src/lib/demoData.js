@@ -1,7 +1,7 @@
 // ─── Demo Users ───────────────────────────────────────────────
-// "Lucas" is the logged-in demo user
+// "Ryan" is the logged-in demo user
 export const demoUsers = {
-  meek:   { id: 'meek',   display_name: 'Lucas',  color: '#f59e0b' },
+  meek:   { id: 'meek',   display_name: 'Ryan',   color: '#f59e0b' },
   crow:   { id: 'crow',   display_name: 'Crow',   color: '#3b82f6' },
   morry:  { id: 'morry',  display_name: 'Morry',  color: '#ef4444' },
   freddy: { id: 'freddy', display_name: 'Freddy', color: '#8b5cf6' },

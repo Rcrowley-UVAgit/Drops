@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Flame, Clock, Music, Search as SearchIcon, ExternalLink, Link2, Check } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { demoGroups, demoPastDrops, getUser, getGroupMembers, getShotclock, formatTimeAgo, MOOD_COLORS, CURRENT_USER } from '../lib/demoData'
+import { demoGroups, demoPastDrops, getUser, getGroupMembers, getShotclock, formatTimeAgo, CURRENT_USER } from '../lib/demoData'
 import DropCard from '../components/DropCard'
 
 export default function GroupPage() {
@@ -188,7 +188,6 @@ function DroppedState({ group }) {
   if (!drop) return null
   const dropper = getUser(drop.user_id)
   const song = drop.song
-  const moodStyle = MOOD_COLORS[drop.mood_tag] || {}
 
   return (
     <motion.div
@@ -231,14 +230,6 @@ function DroppedState({ group }) {
                 <p className="text-base text-white/50">{formatTimeAgo(drop.submitted_at)}</p>
               </div>
             </div>
-            {drop.mood_tag && (
-              <span
-                className="text-base px-3 py-1 rounded-full font-medium"
-                style={{ backgroundColor: moodStyle.bg, color: moodStyle.text, border: `1px solid ${moodStyle.border}` }}
-              >
-                {drop.mood_tag}
-              </span>
-            )}
           </div>
 
           {drop.caption && (

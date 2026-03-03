@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { LogOut, Music, Heart, Hash, Users } from 'lucide-react'
+import { LogOut, Music, Heart, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { demoPastDrops, demoGroups, CURRENT_USER, getUser, MOOD_COLORS, formatTimeAgo } from '../lib/demoData'
+import { demoPastDrops, demoGroups, CURRENT_USER, getUser, formatTimeAgo } from '../lib/demoData'
 
 export default function Profile() {
   const { user, signOut, updateDisplayName } = useAuth()
@@ -23,9 +23,6 @@ export default function Profile() {
 
   const totalReactions = myDrops.reduce((sum, d) => sum + (d.reactions?.length || 0), 0)
   const groupCount = demoGroups.filter(g => g.members.includes(user?.id)).length
-  const moodCounts = {}
-  myDrops.forEach(d => { if (d.mood_tag) moodCounts[d.mood_tag] = (moodCounts[d.mood_tag] || 0) + 1 })
-  const topMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A'
 
   const handleSaveName = () => {
     if (nameInput.trim()) updateDisplayName(nameInput.trim())
@@ -73,12 +70,11 @@ export default function Profile() {
       </motion.div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         {[
           { icon: Music, label: 'Drops', value: myDrops.length },
           { icon: Heart, label: 'Reactions', value: totalReactions },
           { icon: Users, label: 'Groups', value: groupCount },
-          { icon: Hash, label: 'Top Mood', value: topMood },
         ].map(({ icon: Icon, label, value }) => (
           <div key={label} className="bg-[#0f0f0f] rounded-xl p-3 text-center border border-white/[0.04]">
             <Icon size={14} className="text-amber-500 mx-auto mb-1.5" />
@@ -92,7 +88,6 @@ export default function Profile() {
       <div className="space-y-2">
         <h3 className="text-base font-semibold uppercase tracking-wider text-white/50">My Drops</h3>
         {myDrops.length > 0 ? myDrops.map((drop, i) => {
-          const moodStyle = MOOD_COLORS[drop.mood_tag] || {}
           return (
             <motion.div
               key={drop.id}
@@ -112,14 +107,6 @@ export default function Profile() {
                 <p className="text-base font-medium text-white truncate">{drop.song.title}</p>
                 <p className="text-base text-white/60 truncate">{drop.song.artist} · {drop.groupName}</p>
               </div>
-              {drop.mood_tag && (
-                <span
-                  className="text-base px-2 py-0.5 rounded-full font-medium shrink-0"
-                  style={{ backgroundColor: moodStyle.bg, color: moodStyle.text }}
-                >
-                  {drop.mood_tag}
-                </span>
-              )}
             </motion.div>
           )
         }) : (

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Music, ExternalLink, X } from 'lucide-react'
-import { demoPastDrops, demoGroups, getUser, formatTimeAgo, MOOD_COLORS } from '../lib/demoData'
+import { demoPastDrops, demoGroups, getUser, formatTimeAgo } from '../lib/demoData'
 
 export default function Vault() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -122,12 +122,6 @@ export default function Vault() {
                 <>
                   <span>·</span>
                   <span>{selectedDrop.groupName}</span>
-                </>
-              )}
-              {selectedDrop.mood_tag && (
-                <>
-                  <span>·</span>
-                  <span style={{ color: MOOD_COLORS[selectedDrop.mood_tag]?.text }}>{selectedDrop.mood_tag}</span>
                 </>
               )}
             </div>

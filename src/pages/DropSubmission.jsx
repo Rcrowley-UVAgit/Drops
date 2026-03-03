@@ -3,14 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Music, Search as SearchIcon, Check } from 'lucide-react'
 import SongSearch from '../components/SongSearch'
-import { MOOD_TAGS, MOOD_COLORS } from '../lib/demoData'
 
 export default function DropSubmission() {
   const { groupId } = useParams()
   const navigate = useNavigate()
   const [selectedSong, setSelectedSong] = useState(null)
   const [caption, setCaption] = useState('')
-  const [moodTag, setMoodTag] = useState('')
   const [showSearch, setShowSearch] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -136,30 +134,6 @@ export default function DropSubmission() {
             className="w-full bg-white/[0.04] text-white placeholder-white/30 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-amber-500/30 focus:bg-white/[0.06] text-base resize-none transition-all border border-white/[0.06]"
           />
           <p className="text-right text-base text-white/40">{caption.length}/140</p>
-        </div>
-
-        {/* Mood tags */}
-        <div className="space-y-1.5">
-          <label className="text-base text-white/60 font-medium">Mood</label>
-          <div className="flex flex-wrap gap-2">
-            {MOOD_TAGS.map((tag) => {
-              const isSelected = moodTag === tag
-              const style = MOOD_COLORS[tag] || {}
-              return (
-                <button
-                  key={tag}
-                  onClick={() => setMoodTag(isSelected ? '' : tag)}
-                  className="text-base px-3 py-1.5 rounded-full font-medium transition-all"
-                  style={isSelected
-                    ? { backgroundColor: style.bg, color: style.text, border: `1px solid ${style.border}` }
-                    : { backgroundColor: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.06)' }
-                  }
-                >
-                  {tag}
-                </button>
-              )
-            })}
-          </div>
         </div>
 
         {/* Submit */}

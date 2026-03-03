@@ -13,10 +13,10 @@ export default function Sidebar() {
   return (
     <aside className="sidebar-rail w-56 bg-[#0a0a0a] border-r border-white/[0.06] flex flex-col h-full">
       {/* Logo */}
-      <div className="px-5 pt-5 pb-4">
-        <button onClick={() => navigate('/group/uw-lads')} className="flex items-center gap-2 group">
-          <Disc3 size={22} className="text-amber-500 group-hover:rotate-90 transition-transform duration-500" />
-          <span className="text-lg font-bold tracking-tight text-white">DROPS</span>
+      <div className="px-5 pt-5 pb-5">
+        <button onClick={() => navigate('/group/uw-lads')} className="flex items-center gap-3 group">
+          <Disc3 size={32} className="text-amber-500 group-hover:rotate-90 transition-transform duration-500" />
+          <span className="text-2xl font-bold tracking-tight text-white">DROPS</span>
         </button>
       </div>
 
