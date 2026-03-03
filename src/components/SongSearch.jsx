@@ -1,45 +1,34 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Search, Music, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { supabase, isDemoMode } from '../lib/supabase'
-import { demoSearchResults, formatDuration } from '../lib/demoData'
+import { formatDuration } from '../lib/demoData'
+import { searchSpotify } from '../lib/spotify'
 
 export default function SongSearch({ onSelect, onClose }) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   const searchSongs = useCallback(async (searchQuery) => {
     if (!searchQuery.trim()) {
       setResults([])
+      setError(null)
       return
     }
     setLoading(true)
-
-    if (isDemoMode) {
-      await new Promise(r => setTimeout(r, 400))
-      const q = searchQuery.toLowerCase()
-      const filtered = demoSearchResults.filter(s =>
-        s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q) || s.album.toLowerCase().includes(q)
-      )
-      setResults(filtered.length > 0 ? filtered : demoSearchResults)
-      setLoading(false)
-      return
-    }
+    setError(null)
 
     try {
-      const { data, error } = await supabase.functions.invoke('search-songs', {
-        body: { query: searchQuery },
-      })
-      if (error) throw error
-      setResults(data?.tracks || [])
+      const tracks = await searchSpotify(searchQuery)
+      if (tracks) {
+        setResults(tracks)
+      } else {
+        setError('Spotify is not connected. Add VITE_SPOTIFY_CLIENT_ID and VITE_SPOTIFY_CLIENT_SECRET to your .env file.')
+      }
     } catch (err) {
       console.error('Search error:', err)
-      const q = searchQuery.toLowerCase()
-      const filtered = demoSearchResults.filter(s =>
-        s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q)
-      )
-      setResults(filtered.length > 0 ? filtered : demoSearchResults)
+      setError('Search failed. Check your Spotify credentials.')
     } finally {
       setLoading(false)
     }
@@ -71,7 +60,7 @@ export default function SongSearch({ onSelect, onClose }) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="What do you want to share?"
+            placeholder="Search any song..."
             autoFocus
             className="w-full bg-white/[0.06] text-white placeholder-zinc-500 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-amber-500/30 focus:bg-white/[0.08] text-sm transition-all"
           />
@@ -86,7 +75,13 @@ export default function SongSearch({ onSelect, onClose }) {
           </div>
         )}
 
-        {!loading && query && results.length === 0 && (
+        {error && (
+          <div className="text-center py-12 text-red-400 text-sm">
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && query && results.length === 0 && (
           <div className="text-center py-12 text-zinc-500 text-sm">
             No results for "{query}"
           </div>

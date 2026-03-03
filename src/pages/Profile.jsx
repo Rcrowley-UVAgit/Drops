@@ -83,7 +83,7 @@ export default function Profile() {
           <div key={label} className="bg-[#0f0f0f] rounded-xl p-3 text-center border border-white/[0.04]">
             <Icon size={14} className="text-amber-500 mx-auto mb-1.5" />
             <p className="text-base font-bold text-white">{value}</p>
-            <p className="text-[10px] text-zinc-500 mt-0.5">{label}</p>
+            <p className="text-xs text-zinc-500 mt-0.5">{label}</p>
           </div>
         ))}
       </div>
@@ -114,7 +114,7 @@ export default function Profile() {
               </div>
               {drop.mood_tag && (
                 <span
-                  className="text-[10px] px-2 py-0.5 rounded-full font-medium shrink-0"
+                  className="text-xs px-2 py-0.5 rounded-full font-medium shrink-0"
                   style={{ backgroundColor: moodStyle.bg, color: moodStyle.text }}
                 >
                   {drop.mood_tag}

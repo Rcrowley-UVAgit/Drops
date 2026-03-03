@@ -38,7 +38,6 @@ export default function GroupPage() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <h1 className="text-2xl font-bold text-white tracking-tight">{group.name}</h1>
-            <p className="text-sm text-zinc-500 mt-0.5">{group.description}</p>
           </div>
           <button
             onClick={handleCopyInvite}
@@ -105,7 +104,7 @@ function ShotclockDisplay({ shotclock }) {
     <div className="bg-[#0f0f0f] rounded-2xl p-5 border border-white/[0.06]">
       <div className="flex items-center justify-center gap-1 mb-2">
         <Clock size={13} className="text-zinc-500" />
-        <span className="text-[11px] font-semibold uppercase tracking-widest text-zinc-500">Time Remaining</span>
+        <span className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Time Remaining</span>
       </div>
       <div className="flex items-center justify-center gap-3">
         <TimeUnit value={pad(shotclock.hours)} label="HR" />
@@ -122,7 +121,7 @@ function TimeUnit({ value, label }) {
   return (
     <div className="text-center">
       <p className="text-3xl font-bold text-white font-mono tracking-wider">{value}</p>
-      <p className="text-[9px] font-semibold uppercase tracking-widest text-zinc-600 mt-0.5">{label}</p>
+      <p className="text-xs font-semibold uppercase tracking-widest text-zinc-600 mt-0.5">{label}</p>
     </div>
   )
 }
@@ -215,7 +214,7 @@ function DroppedState({ group }) {
               </div>
               <div>
                 <p className="text-sm font-medium text-zinc-200">{dropper.display_name}</p>
-                <p className="text-[11px] text-zinc-500">{formatTimeAgo(drop.submitted_at)}</p>
+                <p className="text-xs text-zinc-500">{formatTimeAgo(drop.submitted_at)}</p>
               </div>
             </div>
             {drop.mood_tag && (
@@ -234,17 +233,28 @@ function DroppedState({ group }) {
           )}
 
           {/* Spotify link */}
-          {song.spotify_url && (
+          <div className="flex items-center gap-3 flex-wrap">
+            {song.spotify_url && (
+              <a
+                href={song.spotify_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm bg-[#1DB954] text-white px-6 py-3 rounded-full font-bold hover:bg-[#17a34a] transition-colors"
+              >
+                <ExternalLink size={14} />
+                Play on Spotify
+              </a>
+            )}
             <a
-              href={song.spotify_url}
+              href={`https://music.apple.com/us/search?term=${encodeURIComponent(song.title + ' ' + song.artist)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm bg-[#1DB954]/15 text-[#1DB954] px-4 py-2 rounded-full font-medium hover:bg-[#1DB954]/25 transition-colors"
+              className="inline-flex items-center gap-2 text-sm bg-[#fc3c44] text-white px-6 py-3 rounded-full font-bold hover:bg-[#e0353d] transition-colors"
             >
               <ExternalLink size={14} />
-              Play on Spotify
+              Apple Music
             </a>
-          )}
+          </div>
 
           {/* Reactions */}
           <DropCard drop={drop} reactionsOnly />

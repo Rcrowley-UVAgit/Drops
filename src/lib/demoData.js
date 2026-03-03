@@ -26,7 +26,6 @@ export const demoGroups = [
     today_drop: null,
     streak_count: 14,
     cycle_index: 1,
-    description: '6 deep. No skips.',
   },
   {
     id: 'fam',
@@ -62,7 +61,6 @@ export const demoGroups = [
     },
     streak_count: 8,
     cycle_index: 2,
-    description: 'Family group chat but for music',
   },
   {
     id: 'beta',
@@ -73,7 +71,6 @@ export const demoGroups = [
     today_drop: null,
     streak_count: 3,
     cycle_index: 1,
-    description: 'Testing grounds',
   },
 ];
 
