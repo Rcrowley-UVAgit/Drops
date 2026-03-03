@@ -37,18 +37,18 @@ export default function Vault() {
     <div className="max-w-2xl mx-auto px-6 py-6 space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-white tracking-tight">The Vault</h1>
-        <p className="text-sm text-zinc-500 mt-0.5">Every drop, archived</p>
+        <p className="text-base text-white/50 mt-0.5">Every drop, archived</p>
       </div>
 
       {/* Search */}
       <div className="relative">
-        <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+        <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search songs, artists, or members..."
-          className="w-full bg-white/[0.04] text-white placeholder-zinc-500 rounded-xl pl-10 pr-4 py-2.5 outline-none focus:ring-1 focus:ring-amber-500/30 text-sm border border-white/[0.06] transition-all"
+          className="w-full bg-white/[0.04] text-white placeholder-white/30 rounded-xl pl-10 pr-4 py-2.5 outline-none focus:ring-1 focus:ring-amber-500/30 text-base border border-white/[0.06] transition-all"
         />
       </div>
 
@@ -75,13 +75,13 @@ export default function Vault() {
               <img src={drop.song.album_art} alt="" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-white/[0.04] flex items-center justify-center">
-                <Music size={24} className="text-zinc-700" />
+                <Music size={24} className="text-white/20" />
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
               <div className="min-w-0">
-                <p className="text-xs font-semibold text-white truncate">{drop.song.title}</p>
-                <p className="text-xs text-zinc-400 truncate">{drop.song.artist}</p>
+                <p className="text-base font-semibold text-white truncate">{drop.song.title}</p>
+                <p className="text-base text-white/60 truncate">{drop.song.artist}</p>
               </div>
             </div>
             {selectedDrop?.id === drop.id && (
@@ -107,14 +107,14 @@ export default function Vault() {
                 )}
                 <div className="min-w-0">
                   <h3 className="font-bold text-white truncate">{selectedDrop.song.title}</h3>
-                  <p className="text-sm text-zinc-400">{selectedDrop.song.artist}</p>
+                  <p className="text-base text-white/60">{selectedDrop.song.artist}</p>
                 </div>
               </div>
-              <button onClick={() => setSelectedDrop(null)} className="text-zinc-600 hover:text-zinc-400 transition-colors">
+              <button onClick={() => setSelectedDrop(null)} className="text-white/30 hover:text-white/60 transition-colors">
                 <X size={16} />
               </button>
             </div>
-            <div className="flex items-center gap-2 text-xs text-zinc-500 flex-wrap">
+            <div className="flex items-center gap-2 text-base text-white/50 flex-wrap">
               <DropperBadge userId={selectedDrop.user_id} />
               <span>·</span>
               <span>{formatTimeAgo(selectedDrop.submitted_at)}</span>
@@ -132,7 +132,7 @@ export default function Vault() {
               )}
             </div>
             {selectedDrop.caption && (
-              <p className="text-sm text-zinc-300 italic">"{selectedDrop.caption}"</p>
+              <p className="text-base text-white/70 italic">"{selectedDrop.caption}"</p>
             )}
             <div className="flex items-center gap-2 flex-wrap">
               {selectedDrop.song.spotify_url && (
@@ -140,7 +140,7 @@ export default function Vault() {
                   href={selectedDrop.song.spotify_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm bg-[#1DB954] text-white px-5 py-2.5 rounded-full font-bold hover:bg-[#17a34a] transition-colors"
+                  className="inline-flex items-center gap-2 text-base bg-[#1DB954] text-white px-5 py-2.5 rounded-full font-bold hover:bg-[#17a34a] transition-colors"
                 >
                   <ExternalLink size={14} />
                   Spotify
@@ -150,7 +150,7 @@ export default function Vault() {
                 href={`https://music.apple.com/us/search?term=${encodeURIComponent(selectedDrop.song.title + ' ' + selectedDrop.song.artist)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm bg-[#fc3c44] text-white px-5 py-2.5 rounded-full font-bold hover:bg-[#e0353d] transition-colors"
+                className="inline-flex items-center gap-2 text-base bg-[#fc3c44] text-white px-5 py-2.5 rounded-full font-bold hover:bg-[#e0353d] transition-colors"
               >
                 <ExternalLink size={14} />
                 Apple Music
@@ -161,7 +161,7 @@ export default function Vault() {
       </AnimatePresence>
 
       {filteredDrops.length === 0 && (
-        <div className="text-center py-16 text-zinc-600 text-sm">
+        <div className="text-center py-16 text-white/30 text-base">
           No drops match your search
         </div>
       )}
@@ -173,10 +173,10 @@ function FilterPill({ label, active, onClick }) {
   return (
     <button
       onClick={onClick}
-      className={`text-xs px-3 py-1.5 rounded-full font-medium transition-all ${
+      className={`text-base px-3 py-1.5 rounded-full font-medium transition-all ${
         active
           ? 'bg-white/[0.1] text-white'
-          : 'bg-white/[0.03] text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.06]'
+          : 'bg-white/[0.03] text-white/50 hover:text-white/80 hover:bg-white/[0.06]'
       }`}
     >
       {label}
@@ -189,7 +189,7 @@ function DropperBadge({ userId }) {
   return (
     <span className="flex items-center gap-1">
       <span
-        className="w-3.5 h-3.5 rounded-full inline-flex items-center justify-center text-[7px] font-bold"
+        className="w-3.5 h-3.5 rounded-full inline-flex items-center justify-center text-base font-bold"
         style={{ backgroundColor: user.color, color: '#000' }}
       >
         {user.display_name[0]}

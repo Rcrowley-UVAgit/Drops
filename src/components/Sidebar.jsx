@@ -24,7 +24,7 @@ export default function Sidebar() {
       <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
         {/* Groups section */}
         <div className="mb-1">
-          <p className="px-2 py-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+          <p className="px-2 py-2 text-base font-semibold uppercase tracking-widest text-white/40">
             Groups
           </p>
           {demoGroups.map((group) => {
@@ -37,22 +37,22 @@ export default function Sidebar() {
                 className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-all duration-150 group ${
                   isActive
                     ? 'bg-white/[0.08] text-white'
-                    : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
+                    : 'text-white/70 hover:text-white hover:bg-white/[0.04]'
                 }`}
               >
                 <div
-                  className={`w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold shrink-0 ${
-                    isActive ? 'bg-amber-500/20 text-amber-400' : 'bg-white/[0.06] text-zinc-400'
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center text-base font-bold shrink-0 ${
+                    isActive ? 'bg-amber-500/20 text-amber-400' : 'bg-white/[0.06] text-white/60'
                   }`}
                 >
                   {group.name[0]}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-medium truncate">{group.name}</p>
-                  <p className="text-[10px] text-zinc-500 truncate">{members.length} members</p>
+                  <p className="text-base font-medium truncate">{group.name}</p>
+                  <p className="text-base text-white/40 truncate">{members.length} members</p>
                 </div>
                 {group.streak_count > 0 && (
-                  <span className="flex items-center gap-0.5 text-[10px] text-amber-500/80 font-medium shrink-0">
+                  <span className="flex items-center gap-0.5 text-base text-amber-500/80 font-medium shrink-0">
                     <Flame size={10} />
                     {group.streak_count}
                   </span>
@@ -89,13 +89,13 @@ export default function Sidebar() {
           className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg hover:bg-white/[0.04] transition-colors group"
         >
           <div
-            className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-zinc-900"
+            className="w-7 h-7 rounded-full flex items-center justify-center text-base font-bold text-zinc-900"
             style={{ backgroundColor: CURRENT_USER.color }}
           >
             {CURRENT_USER.display_name[0]}
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <p className="text-[13px] font-medium text-zinc-200 truncate">{CURRENT_USER.display_name}</p>
+            <p className="text-base font-medium text-white truncate">{CURRENT_USER.display_name}</p>
           </div>
         </button>
       </div>
@@ -110,11 +110,11 @@ function SidebarLink({ icon: Icon, label, active, onClick }) {
       className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-all duration-150 ${
         active
           ? 'bg-white/[0.08] text-white'
-          : 'text-zinc-400 hover:text-white hover:bg-white/[0.04]'
+          : 'text-white/70 hover:text-white hover:bg-white/[0.04]'
       }`}
     >
       <Icon size={16} strokeWidth={active ? 2 : 1.5} />
-      <span className="text-[13px] font-medium">{label}</span>
+      <span className="text-base font-medium">{label}</span>
     </button>
   )
 }

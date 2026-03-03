@@ -38,11 +38,11 @@ export default function Layout({ children }) {
               key={path}
               onClick={() => navigate(path)}
               className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-colors ${
-                isActive ? 'text-amber-500' : 'text-zinc-500 active:text-zinc-300'
+                isActive ? 'text-amber-500' : 'text-white/40 active:text-white/70'
               }`}
             >
               <Icon size={20} strokeWidth={isActive ? 2.5 : 1.5} />
-              <span className="text-xs font-medium">{label}</span>
+              <span className="text-base font-medium">{label}</span>
             </button>
           )
         })}

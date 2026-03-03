@@ -65,7 +65,7 @@ export default function DropSubmission() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="text-sm text-zinc-500"
+          className="text-base text-white/60"
         >
           {selectedSong?.title} by {selectedSong?.artist}
         </motion.p>
@@ -83,7 +83,7 @@ export default function DropSubmission() {
 
       {/* Header */}
       <div className="flex items-center gap-3 px-6 pt-6 pb-4">
-        <button onClick={() => navigate(`/group/${groupId}`)} className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.1] transition-all">
+        <button onClick={() => navigate(`/group/${groupId}`)} className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all">
           <ArrowLeft size={18} />
         </button>
         <h1 className="text-lg font-bold text-white">Drop Your Song</h1>
@@ -102,16 +102,16 @@ export default function DropSubmission() {
                   <img src={selectedSong.album_art} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-white/[0.04] flex items-center justify-center">
-                    <Music size={48} className="text-zinc-700" />
+                    <Music size={48} className="text-white/20" />
                   </div>
                 )}
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent rounded-2xl" />
               <div className="absolute bottom-0 left-0 right-0 p-4">
                 <p className="text-lg font-bold text-white">{selectedSong.title}</p>
-                <p className="text-sm text-zinc-300">{selectedSong.artist} · {selectedSong.album}</p>
+                <p className="text-base text-white/70">{selectedSong.artist} · {selectedSong.album}</p>
               </div>
-              <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm rounded-full px-2.5 py-1 text-xs text-zinc-300 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm rounded-full px-2.5 py-1 text-base text-white/70 opacity-0 group-hover:opacity-100 transition-opacity">
                 Change song
               </div>
             </div>
@@ -120,27 +120,27 @@ export default function DropSubmission() {
               <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center">
                 <SearchIcon size={20} className="text-amber-500" />
               </div>
-              <p className="text-sm text-zinc-400">Search Spotify for a song</p>
+              <p className="text-base text-white/60">Search Spotify for a song</p>
             </div>
           )}
         </button>
 
         {/* Caption */}
         <div className="space-y-1.5">
-          <label className="text-xs text-zinc-500 font-medium">Caption</label>
+          <label className="text-base text-white/60 font-medium">Caption</label>
           <textarea
             value={caption}
             onChange={(e) => setCaption(e.target.value.slice(0, 140))}
             placeholder="What does this song mean to you today?"
             rows={2}
-            className="w-full bg-white/[0.04] text-white placeholder-zinc-600 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-amber-500/30 focus:bg-white/[0.06] text-sm resize-none transition-all border border-white/[0.06]"
+            className="w-full bg-white/[0.04] text-white placeholder-white/30 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-amber-500/30 focus:bg-white/[0.06] text-base resize-none transition-all border border-white/[0.06]"
           />
-          <p className="text-right text-xs text-zinc-600">{caption.length}/140</p>
+          <p className="text-right text-base text-white/40">{caption.length}/140</p>
         </div>
 
         {/* Mood tags */}
         <div className="space-y-1.5">
-          <label className="text-xs text-zinc-500 font-medium">Mood</label>
+          <label className="text-base text-white/60 font-medium">Mood</label>
           <div className="flex flex-wrap gap-2">
             {MOOD_TAGS.map((tag) => {
               const isSelected = moodTag === tag
@@ -149,10 +149,10 @@ export default function DropSubmission() {
                 <button
                   key={tag}
                   onClick={() => setMoodTag(isSelected ? '' : tag)}
-                  className="text-xs px-3 py-1.5 rounded-full font-medium transition-all"
+                  className="text-base px-3 py-1.5 rounded-full font-medium transition-all"
                   style={isSelected
                     ? { backgroundColor: style.bg, color: style.text, border: `1px solid ${style.border}` }
-                    : { backgroundColor: 'rgba(255,255,255,0.04)', color: '#71717a', border: '1px solid rgba(255,255,255,0.06)' }
+                    : { backgroundColor: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.06)' }
                   }
                 >
                   {tag}
@@ -168,7 +168,7 @@ export default function DropSubmission() {
           whileTap={{ scale: 0.98 }}
           onClick={handleSubmit}
           disabled={!selectedSong || submitting}
-          className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-white/[0.06] disabled:text-zinc-600 text-black font-bold rounded-xl py-3.5 text-sm transition-all mt-2"
+          className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-white/[0.06] disabled:text-white/30 text-black font-bold rounded-xl py-3.5 text-base transition-all mt-2"
         >
           {submitting ? (
             <span className="flex items-center justify-center gap-2">

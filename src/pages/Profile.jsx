@@ -54,11 +54,11 @@ export default function Profile() {
               type="text"
               value={nameInput}
               onChange={(e) => setNameInput(e.target.value)}
-              className="bg-white/[0.06] text-white rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-amber-500/30 text-sm text-center border border-white/[0.06]"
+              className="bg-white/[0.06] text-white rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-amber-500/30 text-base text-center border border-white/[0.06]"
               autoFocus
               onKeyDown={(e) => e.key === 'Enter' && handleSaveName()}
             />
-            <button onClick={handleSaveName} className="text-xs bg-amber-500 text-black px-3 py-1.5 rounded-lg font-bold">
+            <button onClick={handleSaveName} className="text-base bg-amber-500 text-black px-3 py-1.5 rounded-lg font-bold">
               Save
             </button>
           </div>
@@ -67,7 +67,7 @@ export default function Profile() {
             <p className="text-xl font-bold text-white group-hover:text-amber-400 transition-colors">
               {user?.display_name}
             </p>
-            <p className="text-xs text-zinc-600 mt-0.5">Tap to edit</p>
+            <p className="text-base text-white/40 mt-0.5">Tap to edit</p>
           </button>
         )}
       </motion.div>
@@ -83,14 +83,14 @@ export default function Profile() {
           <div key={label} className="bg-[#0f0f0f] rounded-xl p-3 text-center border border-white/[0.04]">
             <Icon size={14} className="text-amber-500 mx-auto mb-1.5" />
             <p className="text-base font-bold text-white">{value}</p>
-            <p className="text-xs text-zinc-500 mt-0.5">{label}</p>
+            <p className="text-base text-white/50 mt-0.5">{label}</p>
           </div>
         ))}
       </div>
 
       {/* My drops */}
       <div className="space-y-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">My Drops</h3>
+        <h3 className="text-base font-semibold uppercase tracking-wider text-white/50">My Drops</h3>
         {myDrops.length > 0 ? myDrops.map((drop, i) => {
           const moodStyle = MOOD_COLORS[drop.mood_tag] || {}
           return (
@@ -105,16 +105,16 @@ export default function Profile() {
                 <img src={drop.song.album_art} alt="" className="w-10 h-10 rounded-lg object-cover" />
               ) : (
                 <div className="w-10 h-10 rounded-lg bg-white/[0.04] flex items-center justify-center">
-                  <Music size={16} className="text-zinc-700" />
+                  <Music size={16} className="text-white/20" />
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">{drop.song.title}</p>
-                <p className="text-xs text-zinc-500 truncate">{drop.song.artist} · {drop.groupName}</p>
+                <p className="text-base font-medium text-white truncate">{drop.song.title}</p>
+                <p className="text-base text-white/60 truncate">{drop.song.artist} · {drop.groupName}</p>
               </div>
               {drop.mood_tag && (
                 <span
-                  className="text-xs px-2 py-0.5 rounded-full font-medium shrink-0"
+                  className="text-base px-2 py-0.5 rounded-full font-medium shrink-0"
                   style={{ backgroundColor: moodStyle.bg, color: moodStyle.text }}
                 >
                   {drop.mood_tag}
@@ -123,14 +123,14 @@ export default function Profile() {
             </motion.div>
           )
         }) : (
-          <p className="text-sm text-zinc-600 py-8 text-center">No drops yet</p>
+          <p className="text-base text-white/30 py-8 text-center">No drops yet</p>
         )}
       </div>
 
       {/* Sign out */}
       <button
         onClick={signOut}
-        className="w-full flex items-center justify-center gap-2 text-sm text-red-400/80 hover:text-red-400 py-3 transition-colors"
+        className="w-full flex items-center justify-center gap-2 text-base text-red-400/80 hover:text-red-400 py-3 transition-colors"
       >
         <LogOut size={16} />
         Sign Out

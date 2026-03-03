@@ -50,19 +50,19 @@ export default function SongSearch({ onSelect, onClose }) {
       <div className="p-5 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-white">Search Songs</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.1] transition-all">
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all">
             <X size={18} />
           </button>
         </div>
         <div className="relative">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search any song..."
             autoFocus
-            className="w-full bg-white/[0.06] text-white placeholder-zinc-500 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-amber-500/30 focus:bg-white/[0.08] text-sm transition-all"
+            className="w-full bg-white/[0.06] text-white placeholder-white/30 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-amber-500/30 focus:bg-white/[0.08] text-base transition-all"
           />
         </div>
       </div>
@@ -76,13 +76,13 @@ export default function SongSearch({ onSelect, onClose }) {
         )}
 
         {error && (
-          <div className="text-center py-12 text-red-400 text-sm">
+          <div className="text-center py-12 text-red-400 text-base">
             {error}
           </div>
         )}
 
         {!loading && !error && query && results.length === 0 && (
-          <div className="text-center py-12 text-zinc-500 text-sm">
+          <div className="text-center py-12 text-white/40 text-base">
             No results for "{query}"
           </div>
         )}
@@ -101,14 +101,14 @@ export default function SongSearch({ onSelect, onClose }) {
                 <img src={song.album_art} alt={song.title} className="w-12 h-12 rounded-lg object-cover shadow-lg" />
               ) : (
                 <div className="w-12 h-12 rounded-lg bg-white/[0.04] flex items-center justify-center">
-                  <Music size={20} className="text-zinc-700" />
+                  <Music size={20} className="text-white/20" />
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate group-hover:text-amber-400 transition-colors">{song.title}</p>
-                <p className="text-xs text-zinc-500 truncate">{song.artist} · {song.album}</p>
+                <p className="text-base font-medium text-white truncate group-hover:text-amber-400 transition-colors">{song.title}</p>
+                <p className="text-base text-white/60 truncate">{song.artist} · {song.album}</p>
               </div>
-              <span className="text-xs text-zinc-600 font-mono shrink-0">
+              <span className="text-base text-white/40 font-mono shrink-0">
                 {song.duration_ms ? formatDuration(song.duration_ms) : ''}
               </span>
             </motion.button>
@@ -116,9 +116,9 @@ export default function SongSearch({ onSelect, onClose }) {
         </AnimatePresence>
 
         {!query && !loading && (
-          <div className="text-center py-16 text-zinc-600">
-            <Music size={36} className="mx-auto mb-3 text-zinc-700" />
-            <p className="text-sm">Search for a song to drop</p>
+          <div className="text-center py-16 text-white/30">
+            <Music size={36} className="mx-auto mb-3 text-white/20" />
+            <p className="text-base">Search for a song to drop</p>
           </div>
         )}
       </div>

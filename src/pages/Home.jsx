@@ -109,7 +109,7 @@ export default function Home() {
       <div className="p-4 space-y-4 pt-8 text-center">
         <Music size={48} className="mx-auto text-zinc-600" />
         <h2 className="text-xl font-bold text-zinc-100">No groups yet</h2>
-        <p className="text-sm text-zinc-500">Create or join a group to start sharing music.</p>
+        <p className="text-base text-zinc-500">Create or join a group to start sharing music.</p>
       </div>
     )
   }
@@ -132,7 +132,7 @@ export default function Home() {
       {/* Header */}
       <div className="pt-2">
         <h1 className="text-2xl font-bold text-zinc-100">Home</h1>
-        <p className="text-sm text-zinc-500">What's dropping today?</p>
+        <p className="text-base text-zinc-500">What's dropping today?</p>
       </div>
 
       {/* Drop day banner */}
@@ -150,7 +150,7 @@ export default function Home() {
             </div>
             <div>
               <p className="font-bold text-zinc-900">It's your Drop today!</p>
-              <p className="text-sm text-zinc-800">Share your song before midnight</p>
+              <p className="text-base text-zinc-800">Share your song before midnight</p>
             </div>
             <ChevronRight size={20} className="text-zinc-900 ml-auto" />
           </div>
@@ -170,12 +170,12 @@ export default function Home() {
             <h3 className="font-bold text-zinc-100">{group.name}</h3>
             <div className="flex items-center gap-2 mt-0.5">
               {group.streak_count > 0 && (
-                <span className="flex items-center gap-1 text-xs font-semibold text-amber-500">
+                <span className="flex items-center gap-1 text-base font-semibold text-amber-500">
                   <Flame size={12} />
                   {group.streak_count}
                 </span>
               )}
-              <span className="text-xs text-zinc-500">
+              <span className="text-base text-zinc-500">
                 {group.cycle_index}/{(group.cycle_order || []).length} this cycle
               </span>
             </div>
@@ -190,22 +190,22 @@ export default function Home() {
               <img src={todayDrop.song.album_art_url} alt="" className="w-12 h-12 rounded-lg object-cover" />
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-zinc-200 truncate">{todayDrop.song?.title}</p>
-              <p className="text-xs text-zinc-500 truncate">{todayDrop.song?.artist} · dropped by {todayDrop.user?.display_name}</p>
+              <p className="text-base font-medium text-zinc-200 truncate">{todayDrop.song?.title}</p>
+              <p className="text-base text-zinc-500 truncate">{todayDrop.song?.artist} · dropped by {todayDrop.user?.display_name}</p>
             </div>
           </div>
         ) : (
           <div className="flex items-center gap-3 bg-zinc-800/50 rounded-xl p-3">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-bold ${
               isMyTurn ? 'bg-amber-500 text-zinc-900 animate-pulse' : 'bg-zinc-700 text-zinc-300'
             }`}>
               {currentDropper?.display_name?.[0]?.toUpperCase() || '?'}
             </div>
             <div>
-              <p className="text-sm text-zinc-300">
+              <p className="text-base text-zinc-300">
                 Waiting for <span className="font-semibold">{isMyTurn ? 'you' : currentDropper?.display_name || 'someone'}</span>
               </p>
-              <p className="flex items-center gap-1 text-xs text-zinc-600">
+              <p className="flex items-center gap-1 text-base text-zinc-600">
                 <Clock size={10} />
                 {hoursLeft()} left
               </p>
@@ -224,7 +224,7 @@ export default function Home() {
 
       {/* Recent drops */}
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-zinc-400">Recent Drops</h3>
+        <h3 className="text-base font-semibold text-zinc-400">Recent Drops</h3>
         {recentDrops.map((drop) => (
           <button
             key={drop.id}
@@ -235,12 +235,12 @@ export default function Home() {
               <img src={drop.song.album_art_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-zinc-200 truncate">{drop.song?.title}</p>
-              <p className="text-xs text-zinc-500 truncate">{drop.song?.artist}</p>
+              <p className="text-base text-zinc-200 truncate">{drop.song?.title}</p>
+              <p className="text-base text-zinc-500 truncate">{drop.song?.artist}</p>
             </div>
             <div className="text-right shrink-0">
-              <p className="text-xs text-zinc-500">{drop.user?.display_name}</p>
-              <p className="text-xs text-zinc-600">{drop.mood_tag}</p>
+              <p className="text-base text-zinc-500">{drop.user?.display_name}</p>
+              <p className="text-base text-zinc-600">{drop.mood_tag}</p>
             </div>
           </button>
         ))}

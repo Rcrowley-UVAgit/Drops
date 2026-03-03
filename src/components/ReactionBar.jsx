@@ -32,12 +32,12 @@ export default function ReactionBar({ reactions = [], dropId }) {
             key={type}
             whileTap={{ scale: 0.9 }}
             onClick={() => handleReaction(type)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-base font-medium transition-all ${
               isActive
                 ? 'bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/20'
                 : count > 0
-                  ? 'bg-white/[0.06] text-zinc-300 hover:bg-white/[0.1]'
-                  : 'bg-white/[0.03] text-zinc-600 hover:bg-white/[0.06] hover:text-zinc-400'
+                  ? 'bg-white/[0.06] text-white/80 hover:bg-white/[0.1]'
+                  : 'bg-white/[0.03] text-white/40 hover:bg-white/[0.06] hover:text-white/60'
             }`}
             title={label}
           >

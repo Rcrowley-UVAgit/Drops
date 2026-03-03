@@ -48,16 +48,16 @@ export default function Landing() {
           <h1 className="text-5xl font-bold tracking-tighter text-white">
             DROPS
           </h1>
-          <p className="text-zinc-500 text-sm tracking-wide">
+          <p className="text-white/50 text-base tracking-wide">
             One song. One friend. Every day.
           </p>
         </div>
 
         {/* Steps */}
-        <div className="flex justify-center gap-8 text-xs text-zinc-500">
+        <div className="flex justify-center gap-8 text-base text-white/50">
           {['Spin', 'Share', 'React'].map((step, i) => (
             <div key={step} className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs font-bold border border-amber-500/20">
+              <span className="w-5 h-5 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center text-base font-bold border border-amber-500/20">
                 {i + 1}
               </span>
               <span>{step}</span>
@@ -74,13 +74,13 @@ export default function Landing() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required={!isDemoMode}
-              className="w-full bg-white/[0.04] text-white placeholder-zinc-500 rounded-xl px-4 py-3.5 outline-none focus:ring-2 focus:ring-amber-500/30 focus:bg-white/[0.06] text-sm transition-all border border-white/[0.06]"
+              className="w-full bg-white/[0.04] text-white placeholder-white/30 rounded-xl px-4 py-3.5 outline-none focus:ring-2 focus:ring-amber-500/30 focus:bg-white/[0.06] text-base transition-all border border-white/[0.06]"
             />
-            {error && <p className="text-red-400 text-xs">{error}</p>}
+            {error && <p className="text-red-400 text-base">{error}</p>}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl px-4 py-3.5 text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl px-4 py-3.5 text-base transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isDemoMode ? 'Enter Demo' : loading ? 'Sending...' : 'Get Magic Link'}
               <ArrowRight size={16} />
@@ -93,14 +93,14 @@ export default function Landing() {
             className="bg-white/[0.04] rounded-xl p-6 space-y-2 border border-white/[0.06]"
           >
             <p className="text-amber-500 font-semibold">Check your email</p>
-            <p className="text-zinc-400 text-sm">
+            <p className="text-white/60 text-base">
               Sign-in link sent to <span className="text-white">{email}</span>
             </p>
           </motion.div>
         )}
 
         {isDemoMode && (
-          <p className="text-xs text-zinc-600">
+          <p className="text-base text-white/30">
             Demo mode active
           </p>
         )}
