@@ -42,7 +42,7 @@ export const demoGroups = [
         album: 'The Best of Earth, Wind & Fire, Vol. 1',
         duration_ms: 215000,
         spotify_url: 'https://open.spotify.com/track/5nNmj1cLH3r4aA4XDJ2bgY',
-        album_art: 'https://upload.wikimedia.org/wikipedia/en/2/29/Earth_Wind_%26_Fire_-_The_Best_of_Earth%2C_Wind_%26_Fire%2C_Vol._1.jpg',
+        album_art: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02af0d466d16c97b6385219d90',
       },
       caption: 'Pops never misses with this one',
       mood_tag: 'Feel Good',
@@ -79,21 +79,21 @@ export const demoPastDrops = {
   'uw-lads': [
     {
       id: 'drop-uw-1', user_id: 'crow', drop_date: '2026-03-02',
-      song: { title: 'Money Trees', artist: 'Kendrick Lamar', album: 'good kid, m.A.A.d city', spotify_url: 'https://open.spotify.com/track/2HbKqm4o0w5wEeEFXm2s4y', album_art: 'https://upload.wikimedia.org/wikipedia/en/9/93/Kendrick_Lamar_-_Good_Kid%2C_M.A.A.D_City.jpg' },
+      song: { title: 'Money Trees', artist: 'Kendrick Lamar', album: 'good kid, m.A.A.d city', spotify_url: 'https://open.spotify.com/track/2HbKqm4o0w5wEeEFXm2s4y', album_art: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02d28d2ebdedb220e479743797' },
       caption: 'Ya bish', mood_tag: 'Late Night', submitted_at: '2026-03-02T14:30:00Z',
       reactions: [ { user_id: 'meek', reaction_type: 'classic' }, { user_id: 'morry', reaction_type: 'repeat' }, { user_id: 'freddy', reaction_type: 'listening' }, { user_id: 'bart', reaction_type: 'classic' } ],
       comments: [ { id: 'c10', user_id: 'meek', body: 'This never gets old', created_at: '2026-03-02T15:00:00Z' }, { id: 'c11', user_id: 'bart', body: 'goated pick Crow', created_at: '2026-03-02T16:00:00Z' } ],
     },
     {
       id: 'drop-uw-2', user_id: 'freddy', drop_date: '2026-03-01',
-      song: { title: 'Pink + White', artist: 'Frank Ocean', album: 'Blonde', spotify_url: 'https://open.spotify.com/track/3xKsf9qdS1CyvXSMEid6g8', album_art: 'https://upload.wikimedia.org/wikipedia/en/a/a0/Blonde_-_Frank_Ocean.png' },
+      song: { title: 'Pink + White', artist: 'Frank Ocean', album: 'Blonde', spotify_url: 'https://open.spotify.com/track/3xKsf9qdS1CyvXSMEid6g8', album_art: 'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02c5649add07ed3720be9d5526' },
       caption: 'needed this today', mood_tag: 'Reflective', submitted_at: '2026-03-01T11:15:00Z',
       reactions: [ { user_id: 'meek', reaction_type: 'listening' }, { user_id: 'crow', reaction_type: 'repeat' }, { user_id: 'chuck', reaction_type: 'adding' } ],
       comments: [ { id: 'c20', user_id: 'crow', body: 'Blonde is a masterpiece', created_at: '2026-03-01T12:00:00Z' } ],
     },
     {
       id: 'drop-uw-3', user_id: 'morry', drop_date: '2026-02-28',
-      song: { title: 'HUMBLE.', artist: 'Kendrick Lamar', album: 'DAMN.', spotify_url: 'https://open.spotify.com/track/7KXjTSCq5nL1LoYtL7XAwS', album_art: 'https://upload.wikimedia.org/wikipedia/en/5/51/Kendrick_Lamar_-_Damn.png' },
+      song: { title: 'HUMBLE.', artist: 'Kendrick Lamar', album: 'DAMN.', spotify_url: 'https://open.spotify.com/track/7KXjTSCq5nL1LoYtL7XAwS', album_art: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e028b52c6b9bc4e43d873869699' },
       caption: 'sit down', mood_tag: 'Hype', submitted_at: '2026-02-28T09:45:00Z',
       reactions: [ { user_id: 'meek', reaction_type: 'classic' }, { user_id: 'crow', reaction_type: 'classic' }, { user_id: 'freddy', reaction_type: 'listening' }, { user_id: 'bart', reaction_type: 'adding' }, { user_id: 'chuck', reaction_type: 'repeat' } ],
       comments: [],
@@ -102,14 +102,14 @@ export const demoPastDrops = {
   'fam': [
     {
       id: 'drop-fam-1', user_id: 'mama', drop_date: '2026-03-02',
-      song: { title: 'Golden Hour', artist: 'JVKE', album: 'this is what ____ feels like', spotify_url: 'https://open.spotify.com/track/5odlY52u43F5BjByhxg7wg', album_art: 'https://upload.wikimedia.org/wikipedia/en/5/5e/JVKE_-_this_is_what_____feels_like_%28Vol._1-4%29.png' },
+      song: { title: 'Golden Hour', artist: 'JVKE', album: 'this is what ____ feels like', spotify_url: 'https://open.spotify.com/track/5odlY52u43F5BjByhxg7wg', album_art: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02c2504e80ba2f258697ab2954' },
       caption: 'this song is so beautiful', mood_tag: 'Feel Good', submitted_at: '2026-03-02T16:00:00Z',
       reactions: [ { user_id: 'meek', reaction_type: 'adding' }, { user_id: 'pops', reaction_type: 'listening' }, { user_id: 'logi', reaction_type: 'new' } ],
       comments: [ { id: 'c30', user_id: 'pops', body: 'Good pick honey', created_at: '2026-03-02T17:00:00Z' } ],
     },
     {
       id: 'drop-fam-2', user_id: 'logi', drop_date: '2026-03-01',
-      song: { title: 'Redbone', artist: 'Childish Gambino', album: 'Awaken My Love', spotify_url: 'https://open.spotify.com/track/0wXuerDYiBnERgIpbb3JBR', album_art: 'https://upload.wikimedia.org/wikipedia/en/6/64/Childish_Gambino_-_Awaken%2C_My_Love%21.png' },
+      song: { title: 'Redbone', artist: 'Childish Gambino', album: 'Awaken My Love', spotify_url: 'https://open.spotify.com/track/0wXuerDYiBnERgIpbb3JBR', album_art: 'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02f78c98bbf2b3c9e2a764203e' },
       caption: 'stay woke', mood_tag: 'Late Night', submitted_at: '2026-03-01T10:30:00Z',
       reactions: [ { user_id: 'meek', reaction_type: 'classic' }, { user_id: 'mama', reaction_type: 'listening' } ],
       comments: [],
@@ -118,7 +118,7 @@ export const demoPastDrops = {
   'beta': [
     {
       id: 'drop-beta-1', user_id: 'meek', drop_date: '2026-03-02',
-      song: { title: 'Ivy', artist: 'Frank Ocean', album: 'Blonde', spotify_url: 'https://open.spotify.com/track/2ZWlPOoWh0626oTaHrnl2a', album_art: 'https://upload.wikimedia.org/wikipedia/en/a/a0/Blonde_-_Frank_Ocean.png' },
+      song: { title: 'Ivy', artist: 'Frank Ocean', album: 'Blonde', spotify_url: 'https://open.spotify.com/track/2ZWlPOoWh0626oTaHrnl2a', album_art: 'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02c5649add07ed3720be9d5526' },
       caption: 'thought about this one all day', mood_tag: 'Reflective', submitted_at: '2026-03-02T10:30:00Z',
       reactions: [ { user_id: 'johnny', reaction_type: 'repeat' } ],
       comments: [ { id: 'c40', user_id: 'johnny', body: 'hard', created_at: '2026-03-02T11:00:00Z' } ],
@@ -128,14 +128,14 @@ export const demoPastDrops = {
 
 // ─── Demo Search Results ──────────────────────────────────────
 export const demoSearchResults = [
-  { id: 'sr-1', title: 'Blinding Lights', artist: 'The Weeknd', album: 'After Hours', duration_ms: 200040, spotify_url: 'https://open.spotify.com/track/0VjIjW4GlUZAMYd2vXMi3b', album_art: 'https://upload.wikimedia.org/wikipedia/en/c/c1/The_Weeknd_-_After_Hours.png' },
-  { id: 'sr-2', title: 'Heat Waves', artist: 'Glass Animals', album: 'Dreamland', duration_ms: 238805, spotify_url: 'https://open.spotify.com/track/02MWAaffLxlfxAUY7c5dvx', album_art: 'https://upload.wikimedia.org/wikipedia/en/1/13/Glass_Animals_-_Dreamland.png' },
-  { id: 'sr-3', title: 'Levitating', artist: 'Dua Lipa', album: 'Future Nostalgia', duration_ms: 203064, spotify_url: 'https://open.spotify.com/track/39LLxExYz6ewLAo9BFVV7V', album_art: 'https://upload.wikimedia.org/wikipedia/en/f/f5/Dua_Lipa_-_Future_Nostalgia_%28Official_Album_Cover%29.png' },
-  { id: 'sr-4', title: 'As It Was', artist: 'Harry Styles', album: "Harry's House", duration_ms: 167303, spotify_url: 'https://open.spotify.com/track/4Dvkj6JhhA12EX05fT7y2e', album_art: 'https://upload.wikimedia.org/wikipedia/en/d/d5/Harry_Styles_-_Harry%27s_House.png' },
-  { id: 'sr-5', title: 'Ivy', artist: 'Frank Ocean', album: 'Blonde', duration_ms: 249000, spotify_url: 'https://open.spotify.com/track/2ZWlPOoWh0626oTaHrnl2a', album_art: 'https://upload.wikimedia.org/wikipedia/en/a/a0/Blonde_-_Frank_Ocean.png' },
-  { id: 'sr-6', title: 'Nights', artist: 'Frank Ocean', album: 'Blonde', duration_ms: 307000, spotify_url: 'https://open.spotify.com/track/7eqoqGkKwgOaWNNHx90uEZ', album_art: 'https://upload.wikimedia.org/wikipedia/en/a/a0/Blonde_-_Frank_Ocean.png' },
-  { id: 'sr-7', title: 'Anti-Hero', artist: 'Taylor Swift', album: 'Midnights', duration_ms: 200690, spotify_url: 'https://open.spotify.com/track/0V3wPSX9ygBnCm8psDIeLQ', album_art: 'https://upload.wikimedia.org/wikipedia/en/9/9f/Midnights_-_Taylor_Swift.png' },
-  { id: 'sr-8', title: 'Myth', artist: 'Beach House', album: 'Bloom', duration_ms: 244000, spotify_url: 'https://open.spotify.com/track/2K4aEdgBp5Bv5muFweBkky', album_art: 'https://upload.wikimedia.org/wikipedia/en/1/18/Bloom_Beach_House.jpg' },
+  { id: 'sr-1', title: 'Blinding Lights', artist: 'The Weeknd', album: 'After Hours', duration_ms: 200040, spotify_url: 'https://open.spotify.com/track/0VjIjW4GlUZAMYd2vXMi3b', album_art: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e028863bc11d2aa12b54f5aeb36' },
+  { id: 'sr-2', title: 'Heat Waves', artist: 'Glass Animals', album: 'Dreamland', duration_ms: 238805, spotify_url: 'https://open.spotify.com/track/02MWAaffLxlfxAUY7c5dvx', album_art: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e029e495fb707973f3390850eea' },
+  { id: 'sr-3', title: 'Levitating', artist: 'Dua Lipa', album: 'Future Nostalgia', duration_ms: 203064, spotify_url: 'https://open.spotify.com/track/39LLxExYz6ewLAo9BFVV7V', album_art: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e024bc66095f8a70bc4e6593f4f' },
+  { id: 'sr-4', title: 'As It Was', artist: 'Harry Styles', album: "Harry's House", duration_ms: 167303, spotify_url: 'https://open.spotify.com/track/4Dvkj6JhhA12EX05fT7y2e', album_art: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e0282ce362511fb3d9dda6578ee' },
+  { id: 'sr-5', title: 'Ivy', artist: 'Frank Ocean', album: 'Blonde', duration_ms: 249000, spotify_url: 'https://open.spotify.com/track/2ZWlPOoWh0626oTaHrnl2a', album_art: 'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02c5649add07ed3720be9d5526' },
+  { id: 'sr-6', title: 'Nights', artist: 'Frank Ocean', album: 'Blonde', duration_ms: 307000, spotify_url: 'https://open.spotify.com/track/7eqoqGkKwgOaWNNHx90uEZ', album_art: 'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02c5649add07ed3720be9d5526' },
+  { id: 'sr-7', title: 'Anti-Hero', artist: 'Taylor Swift', album: 'Midnights', duration_ms: 200690, spotify_url: 'https://open.spotify.com/track/0V3wPSX9ygBnCm8psDIeLQ', album_art: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02bb54dde68cd23e2a268ae0f5' },
+  { id: 'sr-8', title: 'Myth', artist: 'Beach House', album: 'Bloom', duration_ms: 244000, spotify_url: 'https://open.spotify.com/track/2K4aEdgBp5Bv5muFweBkky', album_art: 'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e021d52060e8e78ce5b5ef2e530' },
 ];
 
 // ─── Constants ────────────────────────────────────────────────
