@@ -5,5 +5,6 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-// Demo mode flag - set to true when no real Supabase is configured
-export const isDemoMode = supabaseUrl === 'https://your-project.supabase.co'
+// Demo mode flag - forced true until real auth is implemented
+// When ready for real auth, change this to: supabaseUrl === 'https://your-project.supabase.co'
+export const isDemoMode = true
