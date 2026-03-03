@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Flame, Clock, Music, ChevronRight } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { isDemoMode } from '../lib/supabase'
+import { supabase, isDemoMode } from '../lib/supabase'
 import { demoGroup, demoDrops, demoUsers } from '../lib/demoData'
 
 export default function Home() {
@@ -13,26 +13,103 @@ export default function Home() {
   const [todayDrop, setTodayDrop] = useState(null)
   const [currentDropper, setCurrentDropper] = useState(null)
   const [isMyTurn, setIsMyTurn] = useState(false)
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     if (isDemoMode) {
-      setGroup(demoGroup)
-      const today = new Date().toISOString().split('T')[0]
-      const todaysDrop = demoDrops.find(d => d.drop_date === today)
-      setTodayDrop(todaysDrop || null)
-
-      const currentIndex = demoGroup.cycle_index
-      const currentUserId = demoGroup.cycle_order[currentIndex]
-      const dropper = demoUsers.find(u => u.id === currentUserId)
-      setCurrentDropper(dropper)
-      setIsMyTurn(currentUserId === user?.id)
+      loadDemoData()
+      return
     }
+
+    // Try loading real data from Supabase
+    loadRealData()
   }, [user])
 
-  if (!group) {
+  function loadDemoData() {
+    setGroup(demoGroup)
+    const today = new Date().toISOString().split('T')[0]
+    const todaysDrop = demoDrops.find(d => d.drop_date === today)
+    setTodayDrop(todaysDrop || null)
+
+    const currentIndex = demoGroup.cycle_index
+    const currentUserId = demoGroup.cycle_order[currentIndex]
+    const dropper = demoUsers.find(u => u.id === currentUserId)
+    setCurrentDropper(dropper)
+    setIsMyTurn(currentUserId === user?.id)
+    setLoaded(true)
+  }
+
+  async function loadRealData() {
+    try {
+      // Check if user belongs to any group
+      const { data: memberships, error: memErr } = await supabase
+        .from('group_members')
+        .select('group_id, groups(*)')
+        .eq('user_id', user?.id)
+        .limit(1)
+
+      if (memErr || !memberships || memberships.length === 0) {
+        // No groups yet — fall back to demo data
+        loadDemoData()
+        return
+      }
+
+      const grp = memberships[0].groups
+      setGroup(grp)
+
+      const today = new Date().toISOString().split('T')[0]
+      const { data: drops } = await supabase
+        .from('drops')
+        .select('*, songs(*), profiles:user_id(display_name, avatar_url)')
+        .eq('group_id', grp.id)
+        .eq('drop_date', today)
+        .limit(1)
+
+      if (drops && drops.length > 0) {
+        const d = drops[0]
+        setTodayDrop({
+          ...d,
+          song: d.songs,
+          user: { display_name: d.profiles?.display_name },
+        })
+      }
+
+      const cycleOrder = grp.cycle_order || []
+      const currentIndex = grp.cycle_index || 0
+      const currentUserId = cycleOrder[currentIndex]
+      setIsMyTurn(currentUserId === user?.id)
+
+      if (currentUserId) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('id', currentUserId)
+          .single()
+        setCurrentDropper(profile)
+      }
+
+      setLoaded(true)
+    } catch (err) {
+      console.error('Error loading home data:', err)
+      // Fall back to demo data on any error
+      loadDemoData()
+    }
+  }
+
+  if (!loaded) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (!group) {
+    return (
+      <div className="p-4 space-y-4 pt-8 text-center">
+        <Music size={48} className="mx-auto text-zinc-600" />
+        <h2 className="text-xl font-bold text-zinc-100">No groups yet</h2>
+        <p className="text-sm text-zinc-500">Create or join a group to start sharing music.</p>
       </div>
     )
   }
@@ -46,6 +123,9 @@ export default function Home() {
     const mins = Math.floor((diff % 3600000) / 60000)
     return `${hrs}h ${mins}m`
   }
+
+  // Use demo drops for recent feed if in demo mode or no real data
+  const recentDrops = demoDrops.slice(0, 5)
 
   return (
     <div className="p-4 space-y-4">
@@ -96,7 +176,7 @@ export default function Home() {
                 </span>
               )}
               <span className="text-xs text-zinc-500">
-                {group.cycle_index}/{group.cycle_order.length} this cycle
+                {group.cycle_index}/{(group.cycle_order || []).length} this cycle
               </span>
             </div>
           </div>
@@ -106,12 +186,12 @@ export default function Home() {
         {/* Today's drop or waiting state */}
         {todayDrop ? (
           <div className="flex items-center gap-3 bg-zinc-800/50 rounded-xl p-3">
-            {todayDrop.song.album_art_url && (
+            {todayDrop.song?.album_art_url && (
               <img src={todayDrop.song.album_art_url} alt="" className="w-12 h-12 rounded-lg object-cover" />
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-zinc-200 truncate">{todayDrop.song.title}</p>
-              <p className="text-xs text-zinc-500 truncate">{todayDrop.song.artist} · dropped by {todayDrop.user.display_name}</p>
+              <p className="text-sm font-medium text-zinc-200 truncate">{todayDrop.song?.title}</p>
+              <p className="text-xs text-zinc-500 truncate">{todayDrop.song?.artist} · dropped by {todayDrop.user?.display_name}</p>
             </div>
           </div>
         ) : (
@@ -119,11 +199,11 @@ export default function Home() {
             <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
               isMyTurn ? 'bg-amber-500 text-zinc-900 animate-pulse' : 'bg-zinc-700 text-zinc-300'
             }`}>
-              {currentDropper?.display_name?.[0]?.toUpperCase()}
+              {currentDropper?.display_name?.[0]?.toUpperCase() || '?'}
             </div>
             <div>
               <p className="text-sm text-zinc-300">
-                Waiting for <span className="font-semibold">{isMyTurn ? 'you' : currentDropper?.display_name}</span>
+                Waiting for <span className="font-semibold">{isMyTurn ? 'you' : currentDropper?.display_name || 'someone'}</span>
               </p>
               <p className="flex items-center gap-1 text-xs text-zinc-600">
                 <Clock size={10} />
@@ -137,7 +217,7 @@ export default function Home() {
         <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
           <div
             className="h-full bg-amber-500 rounded-full transition-all"
-            style={{ width: `${(group.cycle_index / group.cycle_order.length) * 100}%` }}
+            style={{ width: `${(group.cycle_index / ((group.cycle_order || []).length || 1)) * 100}%` }}
           />
         </div>
       </motion.button>
@@ -145,21 +225,21 @@ export default function Home() {
       {/* Recent drops */}
       <div className="space-y-2">
         <h3 className="text-sm font-semibold text-zinc-400">Recent Drops</h3>
-        {demoDrops.slice(0, 5).map((drop) => (
+        {recentDrops.map((drop) => (
           <button
             key={drop.id}
             onClick={() => navigate(`/group/${group.id}`)}
             className="w-full flex items-center gap-3 bg-zinc-900/50 rounded-xl p-3 text-left hover:bg-zinc-900 transition-colors"
           >
-            {drop.song.album_art_url && (
+            {drop.song?.album_art_url && (
               <img src={drop.song.album_art_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-zinc-200 truncate">{drop.song.title}</p>
-              <p className="text-xs text-zinc-500 truncate">{drop.song.artist}</p>
+              <p className="text-sm text-zinc-200 truncate">{drop.song?.title}</p>
+              <p className="text-xs text-zinc-500 truncate">{drop.song?.artist}</p>
             </div>
             <div className="text-right shrink-0">
-              <p className="text-xs text-zinc-500">{drop.user.display_name}</p>
+              <p className="text-xs text-zinc-500">{drop.user?.display_name}</p>
               <p className="text-[10px] text-zinc-600">{drop.mood_tag}</p>
             </div>
           </button>
