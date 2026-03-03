@@ -1,4 +1,4 @@
-·import { useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { MessageCircle, ExternalLink, Music } from 'lucide-react'
 import { getUser, formatTimeAgo } from '../lib/demoData'
