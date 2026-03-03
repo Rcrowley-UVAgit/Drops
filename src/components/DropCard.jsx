@@ -32,18 +32,17 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08 }}
-      className="relative rounded-2xl overflow-hidden"
-      style={{
-        background: `linear-gradient(135deg, ${dropper.color}18 0%, ${dropper.color}08 40%, #1a1a1a 100%)`
-      }}
+      className="relative rounded-2xl overflow-hidden border border-amber-500/20 bg-gradient-to-br from-amber-500/20 via-amber-500/5 to-transparent"
     >
-      {/* Subtle top accent line in dropper's color */}
-      <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ backgroundColor: dropper.color, opacity: 0.4 }} />
+      {/* Top accent bar */}
+      <div className="h-[3px] bg-gradient-to-r from-amber-500 via-amber-500/60 to-transparent" />
 
       {/* Top section: album art + song info + dropper */}
       <div className="flex gap-4 p-4">
-        {/* Album art */}
-        <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 shadow-lg">
+        {/* Album art with amber ring */}
+        <div
+          className="w-16 h-16 rounded-xl overflow-hidden shrink-0 ring-2 ring-amber-500/30 shadow-lg shadow-amber-500/10"
+        >
           {song.album_art ? (
             <img src={song.album_art} alt={song.title} className="w-full h-full object-cover" />
           ) : (
@@ -68,7 +67,7 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
             >
               {dropper.display_name[0]}
             </div>
-            <span className="text-base text-white/80">{dropper.display_name}</span>
+            <span className="text-base font-medium text-amber-400">{dropper.display_name}</span>
             <span className="text-base text-white/30">·</span>
             <span className="text-base text-white/50">{formatTimeAgo(drop.submitted_at)}</span>
           </div>
@@ -83,7 +82,7 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
       )}
 
       {/* Footer: links, reactions, comments */}
-      <div className="px-4 pb-4 pt-3 space-y-3 border-t border-white/[0.06]">
+      <div className="px-4 pb-4 pt-3 space-y-3 border-t border-amber-500/10">
         {/* Stream links */}
         <div className="flex items-center gap-2 flex-wrap">
           {song.spotify_url && (
