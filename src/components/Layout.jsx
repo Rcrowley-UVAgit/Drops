@@ -17,9 +17,9 @@ export default function Layout({ children }) {
   return (
     <div className="flex flex-col h-full bg-[#060606]">
       {/* Top Banner */}
-      <header className="hidden md:flex items-center justify-between px-6 py-4 border-b border-white/[0.06] bg-[#060606] shrink-0">
-        <button onClick={() => navigate('/group/uw-lads')} className="flex items-center gap-2.5 group">
-          <img src={logoSvg} alt="drops" className="h-12" />
+      <header className="hidden md:flex items-center px-6 py-5 border-b border-white/[0.06] bg-[#060606] shrink-0">
+        <button onClick={() => navigate('/group/uw-lads')} className="flex items-center group">
+          <img src={logoSvg} alt="drops" style={{ height: '52px' }} />
         </button>
       </header>
 
