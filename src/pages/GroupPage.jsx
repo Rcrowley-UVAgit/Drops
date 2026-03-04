@@ -3,13 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Clock, Music, Search as SearchIcon, ExternalLink, Link2, Check, ChevronDown, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { demoGroups, demoPastDrops, getUser, getGroupMembers, getShotclock, formatTimeAgo, CURRENT_USER } from '../lib/demoData'
+import { useGroups } from '../context/GroupsContext'
+import { getUser, getGroupMembers, getShotclock, formatTimeAgo, CURRENT_USER } from '../lib/demoData'
 import DropCard from '../components/DropCard'
 import { ResizableHandle } from '../components/Layout'
 
 export default function GroupPage() {
   const { groupId } = useParams()
   const { user } = useAuth()
+  const { groups, pastDrops: contextPastDrops } = useGroups()
   const navigate = useNavigate()
   const [shotclock, setShotclock] = useState(getShotclock())
   const [copied, setCopied] = useState(false)
@@ -18,10 +20,10 @@ export default function GroupPage() {
   const [centerPct, setCenterPct] = useState(55)
   const containerRef = useRef(null)
 
-  const group = demoGroups.find(g => g.id === groupId) || demoGroups[0]
+  const group = groups.find(g => g.id === groupId) || groups[0]
   const members = getGroupMembers(group)
   const dropper = getUser(group.today_dropper)
-  const pastDrops = demoPastDrops[group.id] || []
+  const pastDrops = contextPastDrops[group.id] || []
   const isMyTurn = group.today_dropper === user?.id
   const spunForGroup = hasSpun[group.id] || false
 
@@ -89,12 +91,8 @@ export default function GroupPage() {
               <Users size={16} className="text-white/40" />
               <span className="text-base font-medium text-white/70">Members</span>
               <span className="text-base text-white/30">{members.length}</span>
-              <ChevronDown
-                size={16}
-                className={`text-white/30 transition-transform duration-200 ${membersOpen ? 'rotate-180' : ''}`}
-              />
+              <ChevronDown size={16} className={`text-white/30 transition-transform duration-200 ${membersOpen ? 'rotate-180' : ''}`} />
             </button>
-
             {membersOpen && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
@@ -108,9 +106,7 @@ export default function GroupPage() {
                     <div
                       key={member.id}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${
-                        isDropper
-                          ? 'bg-white/[0.08] ring-1 ring-white/[0.12]'
-                          : 'bg-white/[0.04]'
+                        isDropper ? 'bg-white/[0.08] ring-1 ring-white/[0.12]' : 'bg-white/[0.04]'
                       }`}
                     >
                       <span className="text-base font-medium" style={{ color: member.color }}>
@@ -130,11 +126,7 @@ export default function GroupPage() {
             ) : (
               <>
                 {group.drop_status !== 'dropped' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                  >
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
                     <ShotclockDisplay shotclock={shotclock} />
                   </motion.div>
                 )}
@@ -195,6 +187,7 @@ function SpinTheWheel({ members, dropper, onComplete }) {
   const [rotation, setRotation] = useState(0)
   const [landed, setLanded] = useState(false)
   const wheelRef = useRef(null)
+
   const segAngle = 360 / members.length
 
   const handleSpin = () => {
@@ -274,38 +267,26 @@ function SpinTheWheel({ members, dropper, onComplete }) {
             const iy1 = center + innerRadius * Math.sin(startRad)
             const ix2 = center + innerRadius * Math.cos(endRad)
             const iy2 = center + innerRadius * Math.sin(endRad)
-
             const largeArc = segAngle > 180 ? 1 : 0
+
             const pathData = `M ${ix1} ${iy1} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${ix1} ${iy1} Z`
 
             const nameRadius = radius * 0.62
             const nameX = center + nameRadius * Math.cos(midRad)
             const nameY = center + nameRadius * Math.sin(midRad)
             const midAngleDeg = (startAngle + endAngle) / 2
-
             /* Flip text that would be upside down */
-            const textRotation = (midAngleDeg > 90 && midAngleDeg < 270)
-              ? midAngleDeg + 180
-              : midAngleDeg
+            const textRotation = (midAngleDeg > 90 && midAngleDeg < 270) ? midAngleDeg + 180 : midAngleDeg
 
             return (
               <g key={member.id}>
-                <path
-                  d={pathData}
-                  fill={`url(#seg-grad-${i})`}
-                  stroke="rgba(255,255,255,0.06)"
-                  strokeWidth="1"
-                />
+                <path d={pathData} fill={`url(#seg-grad-${i})`} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
                 {/* Member name */}
                 <text
-                  x={nameX}
-                  y={nameY}
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  fontSize="15"
-                  fontWeight="600"
-                  fill={member.color}
-                  fillOpacity="0.9"
+                  x={nameX} y={nameY}
+                  textAnchor="middle" dominantBaseline="central"
+                  fontSize="15" fontWeight="600"
+                  fill={member.color} fillOpacity="0.9"
                   transform={`rotate(${textRotation}, ${nameX}, ${nameY})`}
                 >
                   {member.display_name}
@@ -433,6 +414,7 @@ function TimeUnit({ value, label }) {
 /* STATE: Your Turn */
 function YourTurnState({ group, navigate, shotclock, user }) {
   const displayName = user?.display_name || 'You'
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -471,6 +453,7 @@ function DroppedState({ group }) {
   if (!drop) return null
   const dropper = getUser(drop.user_id)
   const song = drop.song
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -500,6 +483,7 @@ function DroppedState({ group }) {
             <p className="text-base text-white/60">{song.artist}</p>
           </div>
         </div>
+
         <div className="p-5 space-y-4">
           <div className="flex items-center gap-2.5">
             <div>
@@ -507,27 +491,19 @@ function DroppedState({ group }) {
               <p className="text-base text-white/35">{formatTimeAgo(drop.submitted_at)}</p>
             </div>
           </div>
+
           {drop.caption && (
             <p className="text-base text-white/50 italic leading-relaxed">{'"'}{drop.caption}{'"'}</p>
           )}
+
           <div className="flex items-center gap-2 flex-wrap">
             {song.spotify_url && (
-              <a
-                href={song.spotify_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-base bg-white/[0.06] text-white/60 px-4 py-2 rounded-lg font-medium hover:bg-white/[0.10] transition-colors border border-white/[0.06]"
-              >
+              <a href={song.spotify_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-base bg-white/[0.06] text-white/60 px-4 py-2 rounded-lg font-medium hover:bg-white/[0.10] transition-colors border border-white/[0.06]">
                 <ExternalLink size={16} />
                 Spotify
               </a>
             )}
-            <a
-              href={`https://music.apple.com/us/search?term=${encodeURIComponent(song.title + ' ' + song.artist)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-base bg-white/[0.06] text-white/60 px-4 py-2 rounded-lg font-medium hover:bg-white/[0.10] transition-colors border border-white/[0.06]"
-            >
+            <a href={`https://music.apple.com/us/search?term=${encodeURIComponent(song.title + ' ' + song.artist)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-base bg-white/[0.06] text-white/60 px-4 py-2 rounded-lg font-medium hover:bg-white/[0.10] transition-colors border border-white/[0.06]">
               <ExternalLink size={16} />
               Apple Music
             </a>
@@ -560,10 +536,7 @@ function WaitingState({ group, dropper, shotclock }) {
             >
               {dropper.display_name[0]}
             </div>
-            <div
-              className="absolute inset-0 rounded-full animate-ping opacity-15"
-              style={{ backgroundColor: dropper.color }}
-            />
+            <div className="absolute inset-0 rounded-full animate-ping opacity-15" style={{ backgroundColor: dropper.color }} />
           </div>
           <h2 className="text-lg font-bold text-white mb-1">
             Waiting for {dropper.display_name}
