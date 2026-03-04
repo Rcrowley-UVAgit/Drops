@@ -109,17 +109,11 @@ export default function GroupPage() {
                       key={member.id}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${
                         isDropper
-                          ? 'bg-accent-600/15 ring-1 ring-accent-500/30'
+                          ? 'bg-white/[0.08] ring-1 ring-white/[0.12]'
                           : 'bg-white/[0.04]'
                       }`}
                     >
-                      <div
-                        className="w-6 h-6 rounded-full flex items-center justify-center text-base font-bold"
-                        style={{ backgroundColor: member.color, color: '#000' }}
-                      >
-                        {member.display_name[0]}
-                      </div>
-                      <span className={`text-base font-medium ${isDropper ? 'text-accent-400' : 'text-white/70'}`}>
+                      <span className="text-base font-medium" style={{ color: member.color }}>
                         {member.display_name}
                       </span>
                     </div>
@@ -381,7 +375,7 @@ function SpinTheWheel({ members, dropper, onComplete }) {
               className={`px-10 py-3.5 rounded-full font-semibold text-base transition-all ${
                 spinning
                   ? 'bg-white/[0.04] text-white/30 cursor-not-allowed border border-white/[0.06]'
-                  : 'bg-accent-600 hover:bg-accent-500 text-white shadow-lg shadow-accent-600/20 border border-accent-500/20'
+                  : 'bg-white/[0.08] hover:bg-white/[0.12] text-white/90 border border-white/[0.10] shadow-lg shadow-black/20'
               }`}
             >
               {spinning ? (
@@ -460,7 +454,7 @@ function YourTurnState({ group, navigate, shotclock, user }) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate(`/group/${group.id}/drop`)}
-            className="flex items-center justify-center gap-2 w-full bg-accent-600 hover:bg-accent-500 text-white font-semibold rounded-xl py-3.5 text-base transition-colors"
+            className="flex items-center justify-center gap-2 w-full bg-white/[0.08] hover:bg-white/[0.12] text-white/90 font-semibold rounded-xl py-3.5 text-base transition-colors border border-white/[0.10]"
           >
             <SearchIcon size={16} />
             Search & Drop
