@@ -37,7 +37,7 @@ export default function Sidebar() {
                     <p className="text-base font-medium truncate">{group.name}</p>
                     {group.streak_count > 0 && (
                       <span className="text-base font-semibold text-accent-400 shrink-0">
-                        {group.streak_count}d
+                        🔥 {group.streak_count}d
                       </span>
                     )}
                   </div>
