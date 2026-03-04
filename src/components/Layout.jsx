@@ -17,7 +17,7 @@ export default function Layout({ children }) {
   return (
     <div className="flex flex-col h-full bg-[#060606]">
       {/* Top Banner */}
-      <header className="hidden md:flex items-center justify-between px-5 py-3 border-b border-white/[0.06] bg-[#0a0a0a] shrink-0">
+      <header className="hidden md:flex items-center justify-between px-5 py-3 border-b border-white/[0.06] bg-[#060606] shrink-0">
         <button onClick={() => navigate('/group/uw-lads')} className="flex items-center gap-2.5 group">
           <Disc3 size={24} className="text-accent-500 group-hover:rotate-180 transition-transform duration-700" />
           <span className="text-xl font-semibold tracking-tight text-white/90">drops</span>
@@ -43,7 +43,7 @@ export default function Layout({ children }) {
         </div>
 
         {/* Main content */}
-        <main className="flex-1 overflow-y-auto pb-16 md:pb-0">
+        <main className="flex-1 overflow-y-auto pb-16 md:pb-0 bg-[#111111]">
           {children}
         </main>
       </div>
@@ -57,6 +57,7 @@ export default function Layout({ children }) {
           const isActive = matchPrefix
             ? location.pathname.startsWith(matchPrefix)
             : location.pathname === path
+
           return (
             <button
               key={path}
