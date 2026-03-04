@@ -13,7 +13,7 @@ export default function GroupPage() {
   const navigate = useNavigate()
   const [shotclock, setShotclock] = useState(getShotclock())
   const [copied, setCopied] = useState(false)
-  const [membersOpen, setMembersOpen] = useState(true)
+  const [membersOpen, setMembersOpen] = useState(false)
   const [hasSpun, setHasSpun] = useState({})
   const [centerPct, setCenterPct] = useState(55)
   const containerRef = useRef(null)
@@ -62,11 +62,6 @@ export default function GroupPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-bold text-white tracking-tight">{group.name}</h1>
-                {group.streak_count > 0 && (
-                  <span className="flex items-center gap-1.5 text-accent-400 font-semibold text-base bg-accent-600/10 px-2.5 py-0.5 rounded-full">
-                    {group.streak_count} streak
-                  </span>
-                )}
               </div>
               <button
                 onClick={handleCopyInvite}
@@ -134,12 +129,12 @@ export default function GroupPage() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                  >
+                >
                     <ShotclockDisplay shotclock={shotclock} />
                   </motion.div>
                 )}
                 {group.drop_status === 'your_turn' && <YourTurnState group={group} navigate={navigate} shotclock={shotclock} user={user} />}
-                {group.drop_status === 'dropped' && <DroppedState group={group} />}
+               {group.drop_status === 'dropped' && <DroppedState group={group} />}
                 {group.drop_status === 'waiting' && <WaitingState group={group} dropper={dropper} shotclock={shotclock} />}
               </>
             )}
@@ -157,7 +152,7 @@ export default function GroupPage() {
 
       {/* RIGHT PANE: Previous Drops desktop */}
       <div
-        className="hidden md:block overflow-y-auto border-l border-white/[0.06]"
+        className="hidden md:block overflow-y-auto border-l border-white/[0.06] bg-[#0a0a0a]"
         style={{ width: `${rightPct}%` }}
       >
         <div className="p-5">
@@ -239,30 +234,6 @@ function SpinTheWheel({ members, dropper, onComplete }) {
           }}
         />
 
-        {/* Outer ring */}
-        <div className="absolute inset-0 rounded-full border border-white/[0.06]" />
-
-        {/* Tick marks around the wheel */}
-        <svg className="absolute inset-0" width={wheelSize} height={wheelSize}>
-          {Array.from({ length: 60 }).map((_, i) => {
-            const angle = (i * 6 - 90) * Math.PI / 180
-            const isMajor = i % 5 === 0
-            const outerR = radius + 4
-            const innerR = radius - (isMajor ? 8 : 4)
-            return (
-              <line
-                key={i}
-                x1={center + outerR * Math.cos(angle)}
-                y1={center + outerR * Math.sin(angle)}
-                x2={center + innerR * Math.cos(angle)}
-                y2={center + innerR * Math.sin(angle)}
-                stroke={isMajor ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)'}
-                strokeWidth={isMajor ? 1.5 : 0.5}
-              />
-            )
-          })}
-        </svg>
-
         {/* Spinning wheel */}
         <svg
           ref={wheelRef}
@@ -274,6 +245,16 @@ function SpinTheWheel({ members, dropper, onComplete }) {
             transition: spinning ? 'transform 7s cubic-bezier(0.15, 0.60, 0.08, 1.0)' : 'none'
           }}
         >
+          {/* Definitions for gradients */}
+          <defs>
+            {members.map((member, i) => (
+              <radialGradient key={`grad-${i}`} id={`seg-grad-${i}`} cx="50%" cy="50%" r="50%">
+                <stop offset="30%" stopColor={member.color} stopOpacity={i % 2 === 0 ? 0.28 : 0.18} />
+                <stop offset="100%" stopColor={member.color} stopOpacity={i % 2 === 0 ? 0.12 : 0.06} />
+              </radialGradient>
+            ))}
+          </defs>
+
           {members.map((member, i) => {
             const startAngle = i * segAngle - 90
             const endAngle = startAngle + segAngle
@@ -281,7 +262,7 @@ function SpinTheWheel({ members, dropper, onComplete }) {
             const endRad = (endAngle * Math.PI) / 180
             const midRad = ((startAngle + endAngle) / 2 * Math.PI) / 180
 
-            const innerRadius = 44
+            const innerRadius = 50
             const x1 = center + radius * Math.cos(startRad)
             const y1 = center + radius * Math.sin(startRad)
             const x2 = center + radius * Math.cos(endRad)
@@ -294,30 +275,23 @@ function SpinTheWheel({ members, dropper, onComplete }) {
 
             const pathData = `M ${ix1} ${iy1} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${ix1} ${iy1} Z`
 
-            const nameRadius = radius * 0.58
+            const nameRadius = radius * 0.62
             const nameX = center + nameRadius * Math.cos(midRad)
             const nameY = center + nameRadius * Math.sin(midRad)
 
-            const segOpacity = i % 2 === 0 ? 0.18 : 0.10
             const midAngleDeg = (startAngle + endAngle) / 2
+            /* Flip text that would be upside down */
+            const textRotation = (midAngleDeg > 90 && midAngleDeg < 270)
+              ? midAngleDeg + 180
+              : midAngleDeg
 
             return (
               <g key={member.id}>
                 <path
                   d={pathData}
-                  fill={member.color}
-                  fillOpacity={segOpacity}
-                  stroke="rgba(255,255,255,0.04)"
-                  strokeWidth="0.5"
-                />
-                {/* Segment divider line */}
-                <line
-                  x1={center + innerRadius * Math.cos(startRad)}
-                  y1={center + innerRadius * Math.sin(startRad)}
-                  x2={center + radius * Math.cos(startRad)}
-                  y2={center + radius * Math.sin(startRad)}
+                  fill={`url(#seg-grad-${i})`}
                   stroke="rgba(255,255,255,0.06)"
-                  strokeWidth="0.5"
+                  strokeWidth="1"
                 />
                 {/* Member name */}
                 <text
@@ -325,11 +299,11 @@ function SpinTheWheel({ members, dropper, onComplete }) {
                   y={nameY}
                   textAnchor="middle"
                   dominantBaseline="central"
-                  fontSize="16"
+                  fontSize="15"
                   fontWeight="600"
                   fill={member.color}
-                  fillOpacity="0.85"
-                  transform={`rotate(${midAngleDeg}, ${nameX}, ${nameY})`}
+                  fillOpacity="0.9"
+                  transform={`rotate(${textRotation}, ${nameX}, ${nameY})`}
                 >
                   {member.display_name}
                 </text>
@@ -337,9 +311,29 @@ function SpinTheWheel({ members, dropper, onComplete }) {
             )
           })}
           {/* Center hub */}
-          <circle cx={center} cy={center} r={42} fill="#0a0a0a" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-          <circle cx={center} cy={center} r={40} fill="none" stroke="rgba(139,92,246,0.12)" strokeWidth="0.5" />
-          <circle cx={center} cy={center} r={3} fill="rgba(139,92,246,0.6)" />
+          <circle cx={center} cy={center} r={48} fill="#0e0e0e" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+          <circle cx={center} cy={center} r={46} fill="none" stroke="rgba(139,92,246,0.15)" strokeWidth="0.5" />
+          <text
+            x={center}
+            y={center - 6}
+            textAnchor="middle"
+            dominantBaseline="central"
+            fontSize="20"
+            fill="rgba(139,92,246,0.5)"
+          >
+            {'\u266B'}
+          </text>
+          <text
+            x={center}
+            y={center + 14}
+            textAnchor="middle"
+            dominantBaseline="central"
+            fontSize="10"
+            fontWeight="500"
+            fill="rgba(255,255,255,0.2)"
+          >
+            DROP
+          </text>
         </svg>
 
         {/* Pointer at top */}
