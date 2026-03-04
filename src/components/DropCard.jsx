@@ -5,6 +5,12 @@ import { getUser, formatTimeAgo } from '../lib/demoData'
 import ReactionBar from './ReactionBar'
 import Comments from './Comments'
 
+function formatDate(dateString) {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+  })
+}
+
 // Convert hex color to rgba
 function hexToRgba(hex, alpha) {
   const r = parseInt(hex.slice(1, 3), 16)
@@ -81,7 +87,7 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
             </div>
             <span className="text-base font-medium" style={{ color: c }}>{dropper.display_name}</span>
             <span className="text-base text-white/30">·</span>
-            <span className="text-base text-white/50">{formatTimeAgo(drop.submitted_at)}</span>
+            <span className="text-base text-white/50">{drop.submitted_at ? formatDate(drop.submitted_at) : formatTimeAgo(drop.submitted_at)}</span>
           </div>
         </div>
       </div>
