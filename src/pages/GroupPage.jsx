@@ -508,14 +508,8 @@ function DroppedState({ group }) {
         </div>
         <div className="p-5 space-y-4">
           <div className="flex items-center gap-2.5">
-            <div
-              className="w-7 h-7 rounded-full flex items-center justify-center text-base font-bold"
-              style={{ backgroundColor: dropper.color, color: '#000' }}
-            >
-              {dropper.display_name[0]}
-            </div>
             <div>
-              <p className="text-base font-medium text-white/80">{dropper.display_name}</p>
+              <p className="text-base font-medium" style={{ color: dropper.color }}>{dropper.display_name}</p>
               <p className="text-base text-white/35">{formatTimeAgo(drop.submitted_at)}</p>
             </div>
           </div>
