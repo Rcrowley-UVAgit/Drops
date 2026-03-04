@@ -2,7 +2,6 @@ import { useState, useRef, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Archive, User, Music, Disc3 } from 'lucide-react'
 import Sidebar from './Sidebar'
-import { CURRENT_USER } from '../lib/demoData'
 
 const MOBILE_NAV = [
   { path: '/group/uw-lads', icon: Music, label: 'Groups', matchPrefix: '/group' },
@@ -21,18 +20,6 @@ export default function Layout({ children }) {
         <button onClick={() => navigate('/group/uw-lads')} className="flex items-center gap-2.5 group">
           <Disc3 size={24} className="text-accent-500 group-hover:rotate-180 transition-transform duration-700" />
           <span className="text-xl font-semibold tracking-tight text-white/90">drops</span>
-        </button>
-        <button
-          onClick={() => navigate('/profile')}
-          className="flex items-center gap-2.5 px-3 py-1.5 rounded-full hover:bg-white/[0.04] transition-colors"
-        >
-          <span className="text-base font-medium text-white/70">{CURRENT_USER.display_name}</span>
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-base font-semibold text-zinc-900"
-            style={{ backgroundColor: CURRENT_USER.color }}
-          >
-            {CURRENT_USER.display_name[0]}
-          </div>
         </button>
       </header>
 
