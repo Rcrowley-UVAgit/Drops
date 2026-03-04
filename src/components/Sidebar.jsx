@@ -1,11 +1,14 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { User, Zap } from 'lucide-react'
-import { demoGroups, getGroupMembers } from '../lib/demoData'
+import { useGroups } from '../context/GroupsContext'
+import { getGroupMembers } from '../lib/demoData'
 
 export default function Sidebar() {
   const location = useLocation()
   const navigate = useNavigate()
+  const { groups } = useGroups()
+
   const currentGroupId = location.pathname.startsWith('/group/')
     ? location.pathname.split('/group/')[1]?.split('/')[0]
     : null
@@ -19,7 +22,7 @@ export default function Sidebar() {
           <p className="px-2 py-2 text-lg font-semibold tracking-tight text-white/50">
             Groups
           </p>
-          {demoGroups.map((group) => {
+          {groups.map((group) => {
             const isActive = currentGroupId === group.id
             const members = getGroupMembers(group)
             return (
