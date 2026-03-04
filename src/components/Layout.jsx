@@ -19,7 +19,7 @@ export default function Layout({ children }) {
       {/* Top Banner */}
       <header className="hidden md:flex items-center px-6 py-5 border-b border-white/[0.06] bg-[#060606] shrink-0">
         <button onClick={() => navigate('/group/uw-lads')} className="flex items-center group">
-          <img src={logoSvg} alt="drops" style={{ height: '52px' }} />
+          <img src={logoSvg} alt="drops" style={{ height: '72px' }} />
         </button>
       </header>
 
