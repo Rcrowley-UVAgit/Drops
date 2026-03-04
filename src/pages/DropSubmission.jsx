@@ -2,13 +2,16 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Music, Search as SearchIcon, Check } from 'lucide-react'
+import { useGroups } from '../context/GroupsContext'
 import SongSearch from '../components/SongSearch'
 
 export default function DropSubmission() {
   const { groupId } = useParams()
   const navigate = useNavigate()
+  const { submitDrop } = useGroups()
   const [selectedSong, setSelectedSong] = useState(null)
   const [caption, setCaption] = useState('')
+  const [moodTag, setMoodTag] = useState(null)
   const [showSearch, setShowSearch] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -22,6 +25,7 @@ export default function DropSubmission() {
     if (!selectedSong) return
     setSubmitting(true)
     await new Promise(r => setTimeout(r, 1000))
+    submitDrop(groupId, selectedSong, caption, moodTag)
     setSubmitted(true)
     setTimeout(() => navigate(`/group/${groupId}`), 2500)
   }
