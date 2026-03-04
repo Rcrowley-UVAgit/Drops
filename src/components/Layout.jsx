@@ -12,7 +12,6 @@ const MOBILE_NAV = [
 export default function Layout({ children }) {
   const location = useLocation()
   const navigate = useNavigate()
-  const isGroupPage = location.pathname.startsWith('/group/') && !location.pathname.includes('/drop')
 
   return (
     <div className="flex h-full bg-[#060606]">
@@ -40,11 +39,11 @@ export default function Layout({ children }) {
               key={path}
               onClick={() => navigate(path)}
               className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-colors ${
-                isActive ? 'text-amber-500' : 'text-white/40 active:text-white/70'
+                isActive ? 'text-accent-400' : 'text-white/30 active:text-white/50'
               }`}
             >
               <Icon size={20} strokeWidth={isActive ? 2.5 : 1.5} />
-              <span className="text-base font-medium">{label}</span>
+              <span className="text-[11px] font-medium">{label}</span>
             </button>
           )
         })}
@@ -53,7 +52,7 @@ export default function Layout({ children }) {
   )
 }
 
-// âââ Resizable Pane Divider (exported for use in GroupPage) ââââ
+// âââ Resizable Pane Divider ââ
 export function ResizableHandle({ onDrag, className = '' }) {
   const dragging = useRef(false)
 
@@ -84,9 +83,9 @@ export function ResizableHandle({ onDrag, className = '' }) {
   return (
     <div
       onMouseDown={onMouseDown}
-      className={`hidden md:flex flex-col items-center justify-center w-2 cursor-col-resize group hover:bg-white/[0.04] transition-colors shrink-0 ${className}`}
+      className={`hidden md:flex flex-col items-center justify-center w-2 cursor-col-resize group hover:bg-white/[0.03] transition-colors shrink-0 ${className}`}
     >
-      <div className="w-[3px] h-8 rounded-full bg-white/[0.08] group-hover:bg-amber-500/40 transition-colors" />
+      <div className="w-[2px] h-8 rounded-full bg-white/[0.06] group-hover:bg-accent-500/30 transition-colors" />
     </div>
   )
 }
