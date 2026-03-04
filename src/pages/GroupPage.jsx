@@ -9,7 +9,7 @@ import DropCard from '../components/DropCard'
 export default function GroupPage() {
   const { groupId } = useParams()
   const { user } = useAuth()
-  const navigate = useNavigate()
+  const navigate = useNavigate() 
   const [shotclock, setShotclock] = useState(getShotclock())
   const [copied, setCopied] = useState(false)
   const [membersOpen, setMembersOpen] = useState(false)
