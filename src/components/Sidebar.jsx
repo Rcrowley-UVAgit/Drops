@@ -24,7 +24,7 @@ export default function Sidebar() {
       <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
         {/* Groups section */}
         <div className="mb-1">
-          <p className="px-2 py-2 text-base font-semibold uppercase tracking-widest text-white/40">
+          <p className="px-2 py-2 text-base font-semibold tracking-widest text-white/40">
             Groups
           </p>
           {demoGroups.map((group) => {
