@@ -25,6 +25,13 @@ export default function GroupPage() {
   const isMyTurn = group.today_dropper === user?.id
   const spunForGroup = hasSpun[group.id] || false
 
+  /* Build allDrops: today's drop (if exists) + past drops */
+  const allDrops = []
+  if (group.today_drop) {
+    allDrops.push(group.today_drop)
+  }
+  allDrops.push(...pastDrops)
+
   useEffect(() => {
     const timer = setInterval(() => setShotclock(getShotclock()), 1000)
     return () => clearInterval(timer)
@@ -82,8 +89,12 @@ export default function GroupPage() {
               <Users size={16} className="text-white/40" />
               <span className="text-base font-medium text-white/70">Members</span>
               <span className="text-base text-white/30">{members.length}</span>
-              <ChevronDown size={16} className={`text-white/30 transition-transform duration-200 ${membersOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown
+                size={16}
+                className={`text-white/30 transition-transform duration-200 ${membersOpen ? 'rotate-180' : ''}`}
+              />
             </button>
+
             {membersOpen && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
@@ -129,19 +140,19 @@ export default function GroupPage() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                >
+                  >
                     <ShotclockDisplay shotclock={shotclock} />
                   </motion.div>
                 )}
                 {group.drop_status === 'your_turn' && <YourTurnState group={group} navigate={navigate} shotclock={shotclock} user={user} />}
-               {group.drop_status === 'dropped' && <DroppedState group={group} />}
+                {group.drop_status === 'dropped' && <DroppedState group={group} />}
                 {group.drop_status === 'waiting' && <WaitingState group={group} dropper={dropper} shotclock={shotclock} />}
               </>
             )}
 
-            {/* Previous Drops mobile only */}
+            {/* Vault mobile only */}
             <div className="md:hidden">
-              {pastDrops.length > 0 && <PreviousDropsPanel pastDrops={pastDrops} />}
+              {allDrops.length > 0 && <VaultPanel drops={allDrops} />}
             </div>
           </div>
         </div>
@@ -150,30 +161,30 @@ export default function GroupPage() {
       {/* DRAG HANDLE */}
       <ResizableHandle onDrag={handleDrag} />
 
-      {/* RIGHT PANE: Previous Drops desktop */}
+      {/* RIGHT PANE: Vault desktop */}
       <div
         className="hidden md:block overflow-y-auto border-l border-white/[0.06] bg-[#0a0a0a]"
         style={{ width: `${rightPct}%` }}
       >
         <div className="p-5">
-          <PreviousDropsPanel pastDrops={pastDrops} />
+          <VaultPanel drops={allDrops} />
         </div>
       </div>
     </div>
   )
 }
 
-/* Previous Drops Panel */
-function PreviousDropsPanel({ pastDrops }) {
+/* Vault Panel (replaces PreviousDropsPanel) */
+function VaultPanel({ drops }) {
   return (
     <div>
       <div className="flex items-center gap-2 mb-4">
-        <h3 className="text-base font-semibold tracking-tight text-white/40">Recent Drops</h3>
-        <span className="text-base text-white/25 bg-white/[0.04] px-2 py-0.5 rounded-full">{pastDrops.length}</span>
+        <h3 className="text-lg font-semibold tracking-tight text-white/50">Vault</h3>
+        <span className="text-base text-white/25 bg-white/[0.04] px-2 py-0.5 rounded-full">{drops.length}</span>
       </div>
-      {pastDrops.length > 0 ? (
+      {drops.length > 0 ? (
         <div className="space-y-3">
-          {pastDrops.map((drop, i) => (
+          {drops.map((drop, i) => (
             <DropCard key={drop.id} drop={drop} index={i} />
           ))}
         </div>
@@ -190,7 +201,6 @@ function SpinTheWheel({ members, dropper, onComplete }) {
   const [rotation, setRotation] = useState(0)
   const [landed, setLanded] = useState(false)
   const wheelRef = useRef(null)
-
   const segAngle = 360 / members.length
 
   const handleSpin = () => {
@@ -202,7 +212,6 @@ function SpinTheWheel({ members, dropper, onComplete }) {
     const fullSpins = 6 + Math.floor(Math.random() * 4)
     const targetOffset = -(dropperIndex * segAngle) - segAngle / 2
     const totalRotation = rotation + fullSpins * 360 + ((targetOffset - rotation % 360 + 720) % 360)
-
     setRotation(totalRotation)
 
     setTimeout(() => {
@@ -261,8 +270,8 @@ function SpinTheWheel({ members, dropper, onComplete }) {
             const startRad = (startAngle * Math.PI) / 180
             const endRad = (endAngle * Math.PI) / 180
             const midRad = ((startAngle + endAngle) / 2 * Math.PI) / 180
-
             const innerRadius = 50
+
             const x1 = center + radius * Math.cos(startRad)
             const y1 = center + radius * Math.sin(startRad)
             const x2 = center + radius * Math.cos(endRad)
@@ -271,15 +280,15 @@ function SpinTheWheel({ members, dropper, onComplete }) {
             const iy1 = center + innerRadius * Math.sin(startRad)
             const ix2 = center + innerRadius * Math.cos(endRad)
             const iy2 = center + innerRadius * Math.sin(endRad)
-            const largeArc = segAngle > 180 ? 1 : 0
 
+            const largeArc = segAngle > 180 ? 1 : 0
             const pathData = `M ${ix1} ${iy1} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${ix1} ${iy1} Z`
 
             const nameRadius = radius * 0.62
             const nameX = center + nameRadius * Math.cos(midRad)
             const nameY = center + nameRadius * Math.sin(midRad)
-
             const midAngleDeg = (startAngle + endAngle) / 2
+
             /* Flip text that would be upside down */
             const textRotation = (midAngleDeg > 90 && midAngleDeg < 270)
               ? midAngleDeg + 180
@@ -310,28 +319,14 @@ function SpinTheWheel({ members, dropper, onComplete }) {
               </g>
             )
           })}
+
           {/* Center hub */}
           <circle cx={center} cy={center} r={48} fill="#0e0e0e" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
           <circle cx={center} cy={center} r={46} fill="none" stroke="rgba(139,92,246,0.15)" strokeWidth="0.5" />
-          <text
-            x={center}
-            y={center - 6}
-            textAnchor="middle"
-            dominantBaseline="central"
-            fontSize="20"
-            fill="rgba(139,92,246,0.5)"
-          >
+          <text x={center} y={center - 6} textAnchor="middle" dominantBaseline="central" fontSize="20" fill="rgba(139,92,246,0.5)">
             {'\u266B'}
           </text>
-          <text
-            x={center}
-            y={center + 14}
-            textAnchor="middle"
-            dominantBaseline="central"
-            fontSize="10"
-            fontWeight="500"
-            fill="rgba(255,255,255,0.2)"
-          >
+          <text x={center} y={center + 14} textAnchor="middle" dominantBaseline="central" fontSize="10" fontWeight="500" fill="rgba(255,255,255,0.2)">
             DROP
           </text>
         </svg>
@@ -444,7 +439,6 @@ function TimeUnit({ value, label }) {
 /* STATE: Your Turn */
 function YourTurnState({ group, navigate, shotclock, user }) {
   const displayName = user?.display_name || 'You'
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -483,7 +477,6 @@ function DroppedState({ group }) {
   if (!drop) return null
   const dropper = getUser(drop.user_id)
   const song = drop.song
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -494,13 +487,11 @@ function DroppedState({ group }) {
         <div className="w-2 h-2 rounded-full bg-emerald-400" />
         <span className="text-base font-semibold text-emerald-400">Today's Drop</span>
       </div>
-
       <div
         className="relative overflow-hidden rounded-2xl border border-white/[0.06]"
         style={{ background: `linear-gradient(135deg, ${dropper.color}12 0%, ${dropper.color}06 30%, #0a0a0a 60%)` }}
       >
         <div className="absolute top-0 left-0 right-0 h-px" style={{ backgroundColor: dropper.color, opacity: 0.3 }} />
-
         <div className="relative aspect-square max-h-80 overflow-hidden">
           {song.album_art ? (
             <img src={song.album_art} alt={song.title} className="w-full h-full object-cover" />
@@ -515,7 +506,6 @@ function DroppedState({ group }) {
             <p className="text-base text-white/60">{song.artist}</p>
           </div>
         </div>
-
         <div className="p-5 space-y-4">
           <div className="flex items-center gap-2.5">
             <div
@@ -529,11 +519,9 @@ function DroppedState({ group }) {
               <p className="text-base text-white/35">{formatTimeAgo(drop.submitted_at)}</p>
             </div>
           </div>
-
           {drop.caption && (
             <p className="text-base text-white/50 italic leading-relaxed">{'"'}{drop.caption}{'"'}</p>
           )}
-
           <div className="flex items-center gap-2 flex-wrap">
             {song.spotify_url && (
               <a
@@ -556,7 +544,6 @@ function DroppedState({ group }) {
               Apple Music
             </a>
           </div>
-
           <DropCard drop={drop} reactionsOnly />
         </div>
       </div>
