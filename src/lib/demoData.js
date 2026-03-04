@@ -7,10 +7,9 @@ export const demoUsers = {
   freddy: { id: 'freddy', display_name: 'Freddy', color: '#8b5cf6' },
   chuck:  { id: 'chuck',  display_name: 'Chuck',  color: '#10b981' },
   bart:   { id: 'bart',   display_name: 'Bart',   color: '#f97316' },
-  logi:   { id: 'logi',   display_name:'Logi',   color: '#06b6d4' },
+  logi:   { id: 'logi',   display_name: 'Logi',   color: '#06b6d4' },
   pops:   { id: 'pops',   display_name: 'Pops',   color: '#84cc16' },
   mama:   { id: 'mama',   display_name: 'Mama',   color: '#ec4899' },
-  johnny: { id: 'johnny', display_name: 'Johnny', color: '#a855f7' },
 };
 
 export const CURRENT_USER = demoUsers.meek;
@@ -62,16 +61,6 @@ export const demoGroups = [
     streak_count: 8,
     cycle_index: 2,
   },
-  {
-    id: 'beta',
-    name: 'Beta',
-    members: ['meek', 'johnny'],
-    today_dropper: 'johnny',
-    drop_status: 'waiting',
-    today_drop: null,
-    streak_count: 3,
-    cycle_index: 1,
-  },
 ];
 
 // ─── Past Drops ───────────────────────────────────────────────
@@ -113,15 +102,6 @@ export const demoPastDrops = {
       caption: 'stay woke', mood_tag: 'Late Night', submitted_at: '2026-03-01T10:30:00Z',
       reactions: [ { user_id: 'meek', reaction_type: 'classic' }, { user_id: 'mama', reaction_type: 'listening' } ],
       comments: [],
-    },
-  ],
-  'beta': [
-    {
-      id: 'drop-beta-1', user_id: 'meek', drop_date: '2026-03-02',
-      song: { title: 'Ivy', artist: 'Frank Ocean', album: 'Blonde', spotify_url: 'https://open.spotify.com/track/2ZWlPOoWh0626oTaHrnl2a', album_art: 'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02c5649add07ed3720be9d5526' },
-      caption: 'thought about this one all day', mood_tag: 'Reflective', submitted_at: '2026-03-02T10:30:00Z',
-      reactions: [ { user_id: 'johnny', reaction_type: 'repeat' } ],
-      comments: [ { id: 'c40', user_id: 'johnny', body: 'hard', created_at: '2026-03-02T11:00:00Z' } ],
     },
   ],
 };
