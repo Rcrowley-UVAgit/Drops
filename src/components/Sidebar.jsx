@@ -11,7 +11,7 @@ export default function Sidebar() {
     : null
 
   return (
-    <aside className="sidebar-rail w-52 bg-[#0a0a0a] border-r border-white/[0.06] flex flex-col h-full">
+    <aside className="sidebar-rail w-52 bg-[#060606] border-r border-white/[0.06] flex flex-col h-full">
       {/* Navigation */}
       <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto pt-4">
         {/* Groups section */}
@@ -26,21 +26,21 @@ export default function Sidebar() {
               <button
                 key={group.id}
                 onClick={() => navigate(`/group/${group.id}`)}
-                className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-all duration-150 group ${
+                className={`w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg text-left transition-all duration-150 group ${
                   isActive
                     ? 'bg-white/[0.07] text-white'
                     : 'text-white/50 hover:text-white/80 hover:bg-white/[0.03]'
                 }`}
               >
-                <div
-                  className={`w-7 h-7 rounded-md flex items-center justify-center text-base font-semibold shrink-0 ${
-                    isActive ? 'bg-accent-600/25 text-accent-400' : 'bg-white/[0.06] text-white/40'
-                  }`}
-                >
-                  {group.name[0]}
-                </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-base font-medium truncate">{group.name}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-base font-medium truncate">{group.name}</p>
+                    {group.streak_count > 0 && (
+                      <span className="text-base font-semibold text-accent-400 shrink-0">
+                        {group.streak_count}d
+                      </span>
+                    )}
+                  </div>
                   <p className="text-base text-white/30 truncate">{members.length} members</p>
                 </div>
               </button>
