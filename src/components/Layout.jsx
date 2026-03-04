@@ -1,3 +1,4 @@
+import { useState, useRef, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Archive, User, Music } from 'lucide-react'
 import Sidebar from './Sidebar'
@@ -11,6 +12,7 @@ const MOBILE_NAV = [
 export default function Layout({ children }) {
   const location = useLocation()
   const navigate = useNavigate()
+  const isGroupPage = location.pathname.startsWith('/group/') && !location.pathname.includes('/drop')
 
   return (
     <div className="flex h-full bg-[#060606]">
@@ -47,6 +49,44 @@ export default function Layout({ children }) {
           )
         })}
       </nav>
+    </div>
+  )
+}
+
+// âââ Resizable Pane Divider (exported for use in GroupPage) ââââ
+export function ResizableHandle({ onDrag, className = '' }) {
+  const dragging = useRef(false)
+
+  const onMouseDown = useCallback((e) => {
+    e.preventDefault()
+    dragging.current = true
+    const startX = e.clientX
+
+    const onMouseMove = (e) => {
+      if (!dragging.current) return
+      onDrag(e.clientX - startX)
+    }
+
+    const onMouseUp = () => {
+      dragging.current = false
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onMouseUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseup', onMouseUp)
+  }, [onDrag])
+
+  return (
+    <div
+      onMouseDown={onMouseDown}
+      className={`hidden md:flex flex-col items-center justify-center w-2 cursor-col-resize group hover:bg-white/[0.04] transition-colors shrink-0 ${className}`}
+    >
+      <div className="w-[3px] h-8 rounded-full bg-white/[0.08] group-hover:bg-amber-500/40 transition-colors" />
     </div>
   )
 }
