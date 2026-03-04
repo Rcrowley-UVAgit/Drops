@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Flame, Clock, Music, Search as SearchIcon, ExternalLink, Link2, Check, ChevronDown, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { demoGroups, demoPastDrops, getUser, getGroupMembers, getShotclock, formatTimeAgo, CURRENT_USER } from '../lib/demoData'
 import DropCard from '../components/DropCard'
+import { ResizableHandle } from '../components/Layout'
 
 export default function GroupPage() {
   const { groupId } = useParams()
@@ -14,7 +15,9 @@ export default function GroupPage() {
   const [copied, setCopied] = useState(false)
   const [membersOpen, setMembersOpen] = useState(false)
   const [hasSpun, setHasSpun] = useState({})
-  const [dropsOpen, setDropsOpen] = useState(true)
+  // Pane widths as percentages of available space
+  const [centerPct, setCenterPct] = useState(55)
+  const containerRef = useRef(null)
 
   const group = demoGroups.find(g => g.id === groupId) || demoGroups[0]
   const members = getGroupMembers(group)
@@ -38,142 +41,169 @@ export default function GroupPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const handleDrag = useCallback((deltaX) => {
+    if (!containerRef.current) return
+    const containerWidth = containerRef.current.offsetWidth
+    const deltaPct = (deltaX / containerWidth) * 100
+    setCenterPct(prev => Math.min(75, Math.max(35, prev + deltaPct)))
+  }, [])
+
+  const rightPct = 100 - centerPct
+
   return (
-    <div className="max-w-2xl mx-auto">
-      {/* Group Header */}
-      <div className="px-6 pt-6 pb-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white tracking-tight">{group.name}</h1>
-            {group.streak_count > 0 && (
-              <span className="flex items-center gap-1 text-amber-500 font-bold text-base">
-                <Flame size={16} />
-                {group.streak_count}
-              </span>
+    <div ref={containerRef} className="flex h-full">
+      {/* ââ CENTER PANE: Spin / Drop Engine ââ */}
+      <div
+        className="overflow-y-auto flex-1 md:flex-none"
+        style={{ width: window.innerWidth >= 768 ? `${centerPct}%` : '100%' }}
+      >
+        <div className="max-w-2xl mx-auto">
+          {/* Group Header */}
+          <div className="px-6 pt-6 pb-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl font-bold text-white tracking-tight">{group.name}</h1>
+                {group.streak_count > 0 && (
+                  <span className="flex items-center gap-1 text-amber-500 font-bold text-base">
+                    <Flame size={16} />
+                    {group.streak_count}
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={handleCopyInvite}
+                className="flex items-center gap-1.5 text-base bg-white/[0.08] text-white px-4 py-1.5 rounded-full hover:bg-white/[0.12] transition-all"
+              >
+                {copied ? <Check size={14} /> : <Link2 size={14} />}
+                {copied ? 'Copied!' : 'Invite'}
+              </button>
+            </div>
+          </div>
+
+          {/* Members dropdown */}
+          <div className="px-6 pb-4">
+            <button
+              onClick={() => setMembersOpen(!membersOpen)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.10] transition-colors"
+            >
+              <Users size={15} className="text-white/60" />
+              <span className="text-base font-medium text-white">Members</span>
+              <span className="text-base text-white/40">{members.length}</span>
+              <ChevronDown
+                size={15}
+                className={`text-white/40 transition-transform duration-200 ${membersOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {membersOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                transition={{ duration: 0.2 }}
+                className="mt-2 flex items-center gap-2 flex-wrap"
+              >
+                {members.map((member) => {
+                  const isDropper = member.id === group.today_dropper
+                  return (
+                    <div
+                      key={member.id}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${
+                        isDropper ? 'bg-amber-500/15 ring-1 ring-amber-500/30' : 'bg-white/[0.06]'
+                      }`}
+                    >
+                      <div
+                        className="w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold"
+                        style={{ backgroundColor: member.color, color: '#000' }}
+                      >
+                        {member.display_name[0]}
+                      </div>
+                      <span className={`text-base font-medium ${isDropper ? 'text-amber-400' : 'text-white'}`}>
+                        {member.display_name}
+                      </span>
+                    </div>
+                  )
+                })}
+              </motion.div>
             )}
           </div>
-          <button
-            onClick={handleCopyInvite}
-            className="flex items-center gap-1.5 text-base bg-white/[0.08] text-white px-4 py-1.5 rounded-full hover:bg-white/[0.12] transition-all"
-          >
-            {copied ? <Check size={14} /> : <Link2 size={14} />}
-            {copied ? 'Copied!' : 'Invite'}
-          </button>
+
+          {/* Main content */}
+          <div className="px-6 space-y-6 pb-8">
+            {!spunForGroup ? (
+              <SpinTheWheel members={members} dropper={dropper} onComplete={handleSpin} />
+            ) : (
+              <>
+                {/* Shotclock â only show after spin, and not after drop */}
+                {group.drop_status !== 'dropped' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <ShotclockDisplay shotclock={shotclock} />
+                  </motion.div>
+                )}
+
+                {group.drop_status === 'your_turn' && <YourTurnState group={group} navigate={navigate} shotclock={shotclock} user={user} />}
+                {group.drop_status === 'dropped' && <DroppedState group={group} />}
+                {group.drop_status === 'waiting' && <WaitingState group={group} dropper={dropper} shotclock={shotclock} />}
+              </>
+            )}
+
+            {/* Previous Drops â mobile only (below md) */}
+            <div className="md:hidden">
+              {pastDrops.length > 0 && (
+                <PreviousDropsPanel pastDrops={pastDrops} />
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Members dropdown */}
-      <div className="px-6 pb-4">
-        <button
-          onClick={() => setMembersOpen(!membersOpen)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.10] transition-colors"
-        >
-          <Users size={15} className="text-white/60" />
-          <span className="text-base font-medium text-white">Members</span>
-          <span className="text-base text-white/40">{members.length}</span>
-          <ChevronDown
-            size={15}
-            className={`text-white/40 transition-transform duration-200 ${membersOpen ? 'rotate-180' : ''}`}
-          />
-        </button>
-        {membersOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            transition={{ duration: 0.2 }}
-            className="mt-2 flex items-center gap-2 flex-wrap"
-          >
-            {members.map((member) => {
-              const isDropper = member.id === group.today_dropper
-              return (
-                <div
-                  key={member.id}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${
-                    isDropper ? 'bg-amber-500/15 ring-1 ring-amber-500/30' : 'bg-white/[0.06]'
-                  }`}
-                >
-                  <div
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold"
-                    style={{ backgroundColor: member.color, color: '#000' }}
-                  >
-                    {member.display_name[0]}
-                  </div>
-                  <span className={`text-base font-medium ${isDropper ? 'text-amber-400' : 'text-white'}`}>
-                    {member.display_name}
-                  </span>
-                </div>
-              )
-            })}
-          </motion.div>
-        )}
-      </div>
+      {/* ââ DRAG HANDLE ââ */}
+      <ResizableHandle onDrag={handleDrag} />
 
-      {/* Main content */}
-      <div className="px-6 space-y-6">
-        {!spunForGroup ? (
-          <SpinTheWheel members={members} dropper={dropper} onComplete={handleSpin} />
-        ) : (
-          <>
-            {/* Shotclock â only show after spin, and not after drop */}
-            {group.drop_status !== 'dropped' && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <ShotclockDisplay shotclock={shotclock} />
-              </motion.div>
-            )}
-
-            {group.drop_status === 'your_turn' && <YourTurnState group={group} navigate={navigate} shotclock={shotclock} user={user} />}
-            {group.drop_status === 'dropped' && <DroppedState group={group} />}
-            {group.drop_status === 'waiting' && <WaitingState group={group} dropper={dropper} shotclock={shotclock} />}
-          </>
-        )}
-
-        {/* Previous Drops â collapsible */}
-        {pastDrops.length > 0 && (
-          <div className="pb-8">
-            <button
-              onClick={() => setDropsOpen(!dropsOpen)}
-              className="flex items-center gap-2 mb-4 group"
-            >
-              <h3 className="text-base font-bold uppercase tracking-wider text-white">Previous Drops</h3>
-              <span className="text-base text-white/40">{pastDrops.length}</span>
-              <ChevronDown
-                size={16}
-                className={`text-white/40 transition-transform duration-200 ${dropsOpen ? 'rotate-180' : ''}`}
-              />
-            </button>
-            <AnimatePresence>
-              {dropsOpen && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="overflow-hidden"
-                >
-                  <div className="space-y-4">
-                    {pastDrops.map((drop, i) => (
-                      <DropCard key={drop.id} drop={drop} index={i} />
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
+      {/* ââ RIGHT PANE: Previous Drops (desktop only) ââ */}
+      <div
+        className="hidden md:block overflow-y-auto border-l border-white/[0.06]"
+        style={{ width: `${rightPct}%` }}
+      >
+        <div className="p-5">
+          <PreviousDropsPanel pastDrops={pastDrops} />
+        </div>
       </div>
     </div>
   )
 }
 
-// âââ Spin the Wheel ââââââââââââââââââââââââââââââââââââââââââ
+// âââ Previous Drops Panel (shared between mobile & desktop) ââ
+function PreviousDropsPanel({ pastDrops }) {
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-4">
+        <h3 className="text-base font-bold uppercase tracking-wider text-white">Previous Drops</h3>
+        <span className="text-base text-white/40">{pastDrops.length}</span>
+      </div>
+      {pastDrops.length > 0 ? (
+        <div className="space-y-4">
+          {pastDrops.map((drop, i) => (
+            <DropCard key={drop.id} drop={drop} index={i} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-base text-white/30 text-center py-8">No drops yet</p>
+      )}
+    </div>
+  )
+}
+
+// âââ Spin the Wheel (Circular, Fintech style) âââââââââââââââââ
 function SpinTheWheel({ members, dropper, onComplete }) {
   const [spinning, setSpinning] = useState(false)
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [rotation, setRotation] = useState(0)
   const [landed, setLanded] = useState(false)
+  const wheelRef = useRef(null)
+
+  const segAngle = 360 / members.length
 
   const handleSpin = () => {
     if (spinning) return
@@ -181,114 +211,207 @@ function SpinTheWheel({ members, dropper, onComplete }) {
     setLanded(false)
 
     const dropperIndex = members.findIndex(m => m.id === dropper.id)
-    const totalCycles = members.length * 3 + dropperIndex
-    let tick = 0
-    let delay = 60
+    // Calculate the final rotation:
+    // We want the dropper segment centered under the pointer (top)
+    // Each segment i is centered at i * segAngle
+    // Pointer is at top (0Â°), wheel rotates clockwise
+    // To land on dropperIndex, the segment center needs to be at top:
+    //   finalAngle = -(dropperIndex * segAngle) + offset for centering
+    // Add multiple full spins for drama
+    const fullSpins = 5 + Math.floor(Math.random() * 3) // 5-7 full spins
+    const targetOffset = -(dropperIndex * segAngle) - segAngle / 2
+    const totalRotation = rotation + fullSpins * 360 + ((targetOffset - rotation % 360 + 720) % 360)
 
-    const advance = () => {
-      tick++
-      setCurrentIndex(tick % members.length)
+    setRotation(totalRotation)
 
-      if (tick >= totalCycles) {
-        setSpinning(false)
-        setLanded(true)
-        setTimeout(onComplete, 1800)
-        return
-      }
-
-      // Ease out: slow down as we get close to the end
-      const progress = tick / totalCycles
-      if (progress > 0.7) {
-        delay = 60 + (progress - 0.7) / 0.3 * 340
-      }
-
-      setTimeout(advance, delay)
-    }
-
-    setTimeout(advance, delay)
+    // Wait for animation to complete, then show result
+    setTimeout(() => {
+      setSpinning(false)
+      setLanded(true)
+      setTimeout(onComplete, 1800)
+    }, 4200) // matches CSS transition duration
   }
 
-  const displayMember = members[currentIndex]
+  // Generate wheel segments as SVG paths
+  const wheelSize = 260
+  const center = wheelSize / 2
+  const radius = wheelSize / 2 - 4
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center"
+      className="flex flex-col items-center py-4"
     >
-      {/* Wheel display */}
-      <div className="relative w-full flex flex-col items-center py-8">
-        {/* Name slots â show a window of names cycling */}
-        <div className="relative h-28 w-64 overflow-hidden rounded-2xl bg-[#1a1a1a] border border-white/[0.08] flex items-center justify-center mb-6">
-          {/* Glow effect when landed */}
-          {landed && (
+      {/* Wheel container */}
+      <div className="relative" style={{ width: wheelSize, height: wheelSize }}>
+        {/* Outer ring glow */}
+        <div
+          className="absolute inset-0 rounded-full"
+          style={{
+            background: landed
+              ? `conic-gradient(from 0deg, ${dropper.color}40, transparent, ${dropper.color}40)`
+              : 'none',
+            filter: landed ? 'blur(12px)' : 'none',
+            transition: 'all 0.6s ease'
+          }}
+        />
+
+        {/* Outer ring */}
+        <div className="absolute inset-0 rounded-full border-2 border-white/[0.08]" />
+
+        {/* Spinning wheel */}
+        <svg
+          ref={wheelRef}
+          width={wheelSize}
+          height={wheelSize}
+          className="absolute inset-0"
+          style={{
+            transform: `rotate(${rotation}deg)`,
+            transition: spinning
+              ? 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)'
+              : 'none'
+          }}
+        >
+          {members.map((member, i) => {
+            const startAngle = i * segAngle - 90 // -90 to start from top
+            const endAngle = startAngle + segAngle
+            const startRad = (startAngle * Math.PI) / 180
+            const endRad = (endAngle * Math.PI) / 180
+            const midRad = ((startAngle + endAngle) / 2 * Math.PI) / 180
+
+            const x1 = center + radius * Math.cos(startRad)
+            const y1 = center + radius * Math.sin(startRad)
+            const x2 = center + radius * Math.cos(endRad)
+            const y2 = center + radius * Math.sin(endRad)
+
+            const largeArc = segAngle > 180 ? 1 : 0
+            const pathData = `M ${center} ${center} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`
+
+            // Label position
+            const labelRadius = radius * 0.62
+            const labelX = center + labelRadius * Math.cos(midRad)
+            const labelY = center + labelRadius * Math.sin(midRad)
+            const labelRotation = (startAngle + endAngle) / 2 + 90
+
+            // Alternate between slightly different opacities for segment visibility
+            const baseOpacity = i % 2 === 0 ? 0.12 : 0.06
+
+            return (
+              <g key={member.id}>
+                {/* Segment fill */}
+                <path
+                  d={pathData}
+                  fill={member.color}
+                  fillOpacity={baseOpacity}
+                  stroke="rgba(255,255,255,0.06)"
+                  strokeWidth="1"
+                />
+                {/* Member avatar circle */}
+                <circle
+                  cx={labelX}
+                  cy={labelY}
+                  r={16}
+                  fill={member.color}
+                  fillOpacity={0.9}
+                />
+                {/* Member initial */}
+                <text
+                  x={labelX}
+                  y={labelY}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fontSize="12"
+                  fontWeight="700"
+                  fill="#000"
+                >
+                  {member.display_name[0]}
+                </text>
+                {/* Name label (only if enough space) */}
+                {segAngle > 30 && (
+                  <text
+                    x={center + radius * 0.38 * Math.cos(midRad)}
+                    y={center + radius * 0.38 * Math.sin(midRad)}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fontSize="9"
+                    fontWeight="500"
+                    fill="rgba(255,255,255,0.5)"
+                    transform={`rotate(${(startAngle + endAngle) / 2}, ${center + radius * 0.38 * Math.cos(midRad)}, ${center + radius * 0.38 * Math.sin(midRad)})`}
+                  >
+                    {member.display_name.length > 8 ? member.display_name.slice(0, 7) + 'â¦' : member.display_name}
+                  </text>
+                )}
+              </g>
+            )
+          })}
+          {/* Center hub */}
+          <circle cx={center} cy={center} r={22} fill="#0a0a0a" stroke="rgba(255,255,255,0.1)" strokeWidth="2" />
+          <circle cx={center} cy={center} r={4} fill="rgba(245,158,11,0.8)" />
+        </svg>
+
+        {/* Pointer / indicator at top */}
+        <div className="absolute left-1/2 -top-1 -translate-x-1/2 z-10">
+          <div
+            className="w-0 h-0"
+            style={{
+              borderLeft: '8px solid transparent',
+              borderRight: '8px solid transparent',
+              borderTop: '14px solid rgb(245,158,11)',
+              filter: 'drop-shadow(0 2px 4px rgba(245,158,11,0.3))'
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Result / Button area */}
+      <div className="mt-6 text-center">
+        <AnimatePresence mode="wait">
+          {landed ? (
             <motion.div
+              key="result"
+              initial={{ opacity: 0, scale: 0.9, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              className="space-y-2"
+            >
+              <p className="text-sm text-white/50 uppercase tracking-widest font-medium">Today's dropper</p>
+              <div className="flex items-center justify-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-base font-bold"
+                  style={{ backgroundColor: dropper.color, color: '#000' }}
+                >
+                  {dropper.display_name[0]}
+                </div>
+                <span className="text-2xl font-bold" style={{ color: dropper.color }}>
+                  {dropper.display_name}
+                </span>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.button
+              key="spin"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="absolute inset-0 rounded-2xl"
-              style={{
-                background: `radial-gradient(circle, ${dropper.color}30 0%, transparent 70%)`,
-                boxShadow: `0 0 40px ${dropper.color}20`
-              }}
-            />
-          )}
-
-          <AnimatePresence mode="popLayout">
-            <motion.div
-              key={spinning || landed ? displayMember.id + '-' + currentIndex : 'idle'}
-              initial={spinning ? { y: 30, opacity: 0 } : false}
-              animate={{ y: 0, opacity: 1 }}
-              exit={spinning ? { y: -30, opacity: 0 } : undefined}
-              transition={{ duration: spinning ? 0.08 : 0.3 }}
-              className="flex items-center gap-3"
+              exit={{ opacity: 0 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={handleSpin}
+              disabled={spinning}
+              className={`px-10 py-3.5 rounded-full font-bold text-base transition-all ${
+                spinning
+                  ? 'bg-white/[0.06] text-white/40 cursor-not-allowed'
+                  : 'bg-amber-500 hover:bg-amber-400 text-black shadow-lg shadow-amber-500/20'
+              }`}
             >
-              <div
-                className={`rounded-full flex items-center justify-center font-bold text-black ${landed ? 'w-14 h-14 text-xl' : 'w-10 h-10 text-base'}`}
-                style={{ backgroundColor: displayMember.color }}
-              >
-                {displayMember.display_name[0]}
-              </div>
-              <span className={`font-bold text-white ${landed ? 'text-2xl' : 'text-xl'}`}>
-                {displayMember.display_name}
-              </span>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Selection indicator lines */}
-          <div className="absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl bg-amber-500/60" />
-          <div className="absolute right-0 top-0 bottom-0 w-1 rounded-r-2xl bg-amber-500/60" />
-        </div>
-
-        {/* Landed celebration */}
-        {landed && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center"
-          >
-            <p className="text-base text-white/60 mb-1">Today's dropper is</p>
-            <p className="text-xl font-bold" style={{ color: dropper.color }}>
-              {dropper.display_name}
-            </p>
-          </motion.div>
-        )}
-
-        {/* Spin button */}
-        {!landed && (
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={handleSpin}
-            disabled={spinning}
-            className={`px-8 py-3.5 rounded-xl font-bold text-base transition-all ${
-              spinning
-                ? 'bg-white/[0.06] text-white/40 cursor-not-allowed'
-                : 'bg-amber-500 hover:bg-amber-400 text-black'
-            }`}
-          >
-            {spinning ? 'Spinning...' : 'Spin the Wheel'}
-          </motion.button>
-        )}
+              {spinning ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white/80 rounded-full animate-spin" />
+                  Spinningâ¦
+                </span>
+              ) : 'Spin the Wheel'}
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   )
