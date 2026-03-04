@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Archive, User, Music, Disc3 } from 'lucide-react'
+import { Archive, User, Music } from 'lucide-react'
 import Sidebar from './Sidebar'
+import logoSvg from '/vite.svg'
 
 const MOBILE_NAV = [
   { path: '/group/uw-lads', icon: Music, label: 'Groups', matchPrefix: '/group' },
@@ -18,8 +19,7 @@ export default function Layout({ children }) {
       {/* Top Banner */}
       <header className="hidden md:flex items-center justify-between px-5 py-3 border-b border-white/[0.06] bg-[#060606] shrink-0">
         <button onClick={() => navigate('/group/uw-lads')} className="flex items-center gap-2.5 group">
-          <Disc3 size={24} className="text-accent-500 group-hover:rotate-180 transition-transform duration-700" />
-          <span className="text-xl font-semibold tracking-tight text-white/90">drops</span>
+          <img src={logoSvg} alt="drops" className="h-7" />
         </button>
       </header>
 
@@ -50,7 +50,9 @@ export default function Layout({ children }) {
               key={path}
               onClick={() => navigate(path)}
               className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-colors ${
-                isActive ? 'text-accent-400' : 'text-white/30 active:text-white/50'
+                isActive
+                  ? 'text-accent-400'
+                  : 'text-white/30 active:text-white/50'
               }`}
             >
               <Icon size={20} strokeWidth={isActive ? 2.5 : 1.5} />
