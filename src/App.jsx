@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { GroupsProvider } from './context/GroupsContext'
 import Layout from './components/Layout'
 import Landing from './pages/Landing'
 import GroupPage from './pages/GroupPage'
@@ -44,9 +45,11 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter basename="/Drops/">
+    <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <GroupsProvider>
+          <AppRoutes />
+        </GroupsProvider>
       </AuthProvider>
     </BrowserRouter>
   )
