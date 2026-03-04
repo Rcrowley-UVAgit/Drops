@@ -24,9 +24,9 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
         <ReactionBar reactions={reactions} dropId={drop.id} />
         <button
           onClick={() => setShowComments(!showComments)}
-          className="flex items-center gap-1.5 text-[12px] text-white/40 hover:text-white/60 transition-colors"
+          className="flex items-center gap-1.5 text-base text-white/40 hover:text-white/60 transition-colors"
         >
-          <MessageCircle size={12} />
+          <MessageCircle size={16} />
           {comments.length > 0 ? `${comments.length} comment${comments.length > 1 ? 's' : ''}` : 'Comment'}
         </button>
         {showComments && <Comments comments={comments} dropId={drop.id} />}
@@ -55,26 +55,26 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
         </div>
 
         <div className="flex-1 min-w-0">
-          <h4 className="text-[13px] font-semibold text-white truncate">{song.title}</h4>
-          <p className="text-[12px] text-white/45 truncate">{song.artist}</p>
+          <h4 className="text-base font-semibold text-white truncate">{song.title}</h4>
+          <p className="text-base text-white/45 truncate">{song.artist}</p>
 
           <div className="flex items-center gap-1.5 mt-1.5">
             <div
-              className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold"
+              className="w-5 h-5 rounded-full flex items-center justify-center text-base font-bold"
               style={{ backgroundColor: dropper.color, color: '#000' }}
             >
               {dropper.display_name[0]}
             </div>
-            <span className="text-[12px] font-medium text-white/50">{dropper.display_name}</span>
-            <span className="text-[12px] text-white/20">Â·</span>
-            <span className="text-[12px] text-white/30">{dateStr ? formatDate(dateStr) : formatTimeAgo(drop.submitted_at)}</span>
+            <span className="text-base font-medium text-white/50">{dropper.display_name}</span>
+            <span className="text-base text-white/20">{'\u00B7'}</span>
+            <span className="text-base text-white/30">{dateStr ? formatDate(dateStr) : formatTimeAgo(drop.submitted_at)}</span>
           </div>
         </div>
       </div>
 
       {caption && (
         <div className="px-4 pb-2">
-          <p className="text-[12px] text-white/40 italic">"{caption}"</p>
+          <p className="text-base text-white/40 italic">{'"'}{caption}{'"'}</p>
         </div>
       )}
 
@@ -82,20 +82,20 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
         <div className="flex items-center gap-2 flex-wrap">
           {song.spotify_url && (
             <a href={song.spotify_url} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-[11px] text-white/50 border border-white/[0.08] px-3 py-1.5 rounded-md font-medium hover:bg-white/[0.04] transition-colors">
-              <ExternalLink size={10} /> Spotify
+              className="inline-flex items-center gap-1.5 text-base text-white/50 border border-white/[0.08] px-3 py-1.5 rounded-md font-medium hover:bg-white/[0.04] transition-colors">
+              <ExternalLink size={16} /> Spotify
             </a>
           )}
           <a href={`https://music.apple.com/us/search?term=${encodeURIComponent(song.title + ' ' + song.artist)}`}
             target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-[11px] text-white/50 border border-white/[0.08] px-3 py-1.5 rounded-md font-medium hover:bg-white/[0.04] transition-colors">
-            <ExternalLink size={10} /> Apple Music
+            className="inline-flex items-center gap-1.5 text-base text-white/50 border border-white/[0.08] px-3 py-1.5 rounded-md font-medium hover:bg-white/[0.04] transition-colors">
+            <ExternalLink size={16} /> Apple Music
           </a>
         </div>
         <ReactionBar reactions={reactions} dropId={drop.id} />
         <button onClick={() => setShowComments(!showComments)}
-          className="flex items-center gap-1.5 text-[12px] text-white/35 hover:text-white/55 transition-colors">
-          <MessageCircle size={11} />
+          className="flex items-center gap-1.5 text-base text-white/35 hover:text-white/55 transition-colors">
+          <MessageCircle size={16} />
           {comments.length > 0 ? `${comments.length} comment${comments.length > 1 ? 's' : ''}` : 'Comment'}
         </button>
         {showComments && <Comments comments={comments} dropId={drop.id} />}
