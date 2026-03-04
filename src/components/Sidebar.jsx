@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Archive, User } from 'lucide-react'
+import { User, Zap } from 'lucide-react'
 import { demoGroups, getGroupMembers } from '../lib/demoData'
 
 export default function Sidebar() {
@@ -16,7 +16,7 @@ export default function Sidebar() {
       <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto pt-4">
         {/* Groups section */}
         <div className="mb-1">
-          <p className="px-2 py-2 text-base font-medium tracking-tight text-white/30">
+          <p className="px-2 py-2 text-lg font-semibold tracking-tight text-white/50">
             Groups
           </p>
           {demoGroups.map((group) => {
@@ -33,11 +33,12 @@ export default function Sidebar() {
                 }`}
               >
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <p className="text-base font-medium truncate">{group.name}</p>
                     {group.streak_count > 0 && (
-                      <span className="text-base font-semibold text-accent-400 shrink-0">
-                        🔥 {group.streak_count}d
+                      <span className="flex items-center gap-0.5 text-base font-semibold text-accent-400 shrink-0">
+                        <Zap size={14} fill="currentColor" className="text-accent-400" />
+                        {group.streak_count}d
                       </span>
                     )}
                   </div>
@@ -52,13 +53,6 @@ export default function Sidebar() {
         <div className="h-px bg-white/[0.06] mx-2 my-3" />
 
         {/* Other nav items */}
-        <SidebarLink
-          icon={Archive}
-          label="Vault"
-          path="/vault"
-          active={location.pathname === '/vault'}
-          onClick={() => navigate('/vault')}
-        />
         <SidebarLink
           icon={User}
           label="Profile"
