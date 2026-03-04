@@ -245,8 +245,6 @@ function SpinTheWheel({ members, dropper, onComplete }) {
         {/* Tick marks around the wheel */}
         <svg className="absolute inset-0" width={wheelSize} height={wheelSize}>
           {Array.from({ length: 60 }).map((_, i) => {
-            const angle = (i * 6" width={wheelSize} height={wheelSize}>
-          {Array.from({ length: 60 }).map((_, i) => {
             const angle = (i * 6 - 90) * Math.PI / 180
             const isMajor = i % 5 === 0
             const outerR = radius + 4
