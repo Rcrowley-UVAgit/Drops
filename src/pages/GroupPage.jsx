@@ -68,7 +68,7 @@ export default function GroupPage() {
           <div className="px-5 pt-6 pb-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold text-white tracking-tight">{group.name}</h1>
+                <h1 className="text-lg font-semibold tracking-tight text-white/50">{group.name}</h1>
               </div>
               <button
                 onClick={handleCopyInvite}
