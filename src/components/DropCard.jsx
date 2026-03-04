@@ -59,13 +59,7 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
           <h4 className="text-base font-semibold text-white truncate">{song.title}</h4>
           <p className="text-base text-white/45 truncate">{song.artist}</p>
           <div className="flex items-center gap-1.5 mt-1.5">
-            <div
-              className="w-5 h-5 rounded-full flex items-center justify-center text-base font-bold"
-              style={{ backgroundColor: dropper.color, color: '#000' }}
-            >
-              {dropper.display_name[0]}
-            </div>
-            <span className="text-base font-medium text-white/50">{dropper.display_name}</span>
+            <span className="text-base font-medium" style={{ color: dropper.color }}>{dropper.display_name}</span>
             <span className="text-base text-white/20">{'\u00B7'}</span>
             <span className="text-base text-white/30">{dateStr ? formatDate(dateStr) : formatTimeAgo(drop.submitted_at)}</span>
           </div>
