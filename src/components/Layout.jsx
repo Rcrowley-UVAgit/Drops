@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Archive, User, Music } from 'lucide-react'
+import { Archive, User, Music, Disc3 } from 'lucide-react'
 import Sidebar from './Sidebar'
+import { CURRENT_USER } from '../lib/demoData'
 
 const MOBILE_NAV = [
   { path: '/group/uw-lads', icon: Music, label: 'Groups', matchPrefix: '/group' },
@@ -14,16 +15,38 @@ export default function Layout({ children }) {
   const navigate = useNavigate()
 
   return (
-    <div className="flex h-full bg-[#060606]">
-      {/* Desktop sidebar */}
-      <div className="hidden md:flex">
-        <Sidebar />
-      </div>
+    <div className="flex flex-col h-full bg-[#060606]">
+      {/* Top Banner */}
+      <header className="hidden md:flex items-center justify-between px-5 py-3 border-b border-white/[0.06] bg-[#0a0a0a] shrink-0">
+        <button onClick={() => navigate('/group/uw-lads')} className="flex items-center gap-2.5 group">
+          <Disc3 size={24} className="text-accent-500 group-hover:rotate-180 transition-transform duration-700" />
+          <span className="text-xl font-semibold tracking-tight text-white/90">drops</span>
+        </button>
+        <button
+          onClick={() => navigate('/profile')}
+          className="flex items-center gap-2.5 px-3 py-1.5 rounded-full hover:bg-white/[0.04] transition-colors"
+        >
+          <span className="text-base font-medium text-white/70">{CURRENT_USER.display_name}</span>
+          <div
+            className="w-8 h-8 rounded-full flex items-center justify-center text-base font-semibold text-zinc-900"
+            style={{ backgroundColor: CURRENT_USER.color }}
+          >
+            {CURRENT_USER.display_name[0]}
+          </div>
+        </button>
+      </header>
 
-      {/* Main content */}
-      <main className="flex-1 overflow-y-auto pb-16 md:pb-0">
-        {children}
-      </main>
+      <div className="flex flex-1 overflow-hidden">
+        {/* Desktop sidebar */}
+        <div className="hidden md:flex">
+          <Sidebar />
+        </div>
+
+        {/* Main content */}
+        <main className="flex-1 overflow-y-auto pb-16 md:pb-0">
+          {children}
+        </main>
+      </div>
 
       {/* Mobile bottom nav */}
       <nav
@@ -43,7 +66,7 @@ export default function Layout({ children }) {
               }`}
             >
               <Icon size={20} strokeWidth={isActive ? 2.5 : 1.5} />
-              <span className="text-[11px] font-medium">{label}</span>
+              <span className="text-base font-medium">{label}</span>
             </button>
           )
         })}
@@ -52,7 +75,7 @@ export default function Layout({ children }) {
   )
 }
 
-// âââ Resizable Pane Divider ââ
+// Resizable Pane Divider
 export function ResizableHandle({ onDrag, className = '' }) {
   const dragging = useRef(false)
 
