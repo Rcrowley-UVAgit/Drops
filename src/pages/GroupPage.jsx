@@ -13,7 +13,7 @@ export default function GroupPage() {
   const navigate = useNavigate()
   const [shotclock, setShotclock] = useState(getShotclock())
   const [copied, setCopied] = useState(false)
-  const [membersOpen, setMembersOpen] = useState(false)
+  const [membersOpen, setMembersOpen] = useState(true)
   const [hasSpun, setHasSpun] = useState({})
   const [centerPct, setCenterPct] = useState(55)
   const containerRef = useRef(null)
@@ -58,36 +58,36 @@ export default function GroupPage() {
       >
         <div className="max-w-2xl mx-auto">
           {/* Group Header */}
-          <div className="px-6 pt-6 pb-2">
+          <div className="px-5 pt-6 pb-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-bold text-white tracking-tight">{group.name}</h1>
                 {group.streak_count > 0 && (
-                  <span className="flex items-center gap-1.5 text-accent-400 font-semibold text-sm bg-accent-600/10 px-2.5 py-0.5 rounded-full">
+                  <span className="flex items-center gap-1.5 text-accent-400 font-semibold text-base bg-accent-600/10 px-2.5 py-0.5 rounded-full">
                     {group.streak_count} streak
                   </span>
                 )}
               </div>
               <button
                 onClick={handleCopyInvite}
-                className="flex items-center gap-1.5 text-sm bg-white/[0.06] text-white/70 px-4 py-1.5 rounded-full hover:bg-white/[0.10] transition-all border border-white/[0.06]"
+                className="flex items-center gap-1.5 text-base bg-white/[0.06] text-white/70 px-4 py-1.5 rounded-full hover:bg-white/[0.10] transition-all border border-white/[0.06]"
               >
-                {copied ? <Check size={13} /> : <Link2 size={13} />}
+                {copied ? <Check size={16} /> : <Link2 size={16} />}
                 {copied ? 'Copied!' : 'Invite'}
               </button>
             </div>
           </div>
 
           {/* Members dropdown */}
-          <div className="px-6 pb-4">
+          <div className="px-5 pb-4">
             <button
               onClick={() => setMembersOpen(!membersOpen)}
               className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.07] transition-colors border border-white/[0.04]"
             >
-              <Users size={14} className="text-white/40" />
-              <span className="text-sm font-medium text-white/70">Members</span>
-              <span className="text-sm text-white/30">{members.length}</span>
-              <ChevronDown size={14} className={`text-white/30 transition-transform duration-200 ${membersOpen ? 'rotate-180' : ''}`} />
+              <Users size={16} className="text-white/40" />
+              <span className="text-base font-medium text-white/70">Members</span>
+              <span className="text-base text-white/30">{members.length}</span>
+              <ChevronDown size={16} className={`text-white/30 transition-transform duration-200 ${membersOpen ? 'rotate-180' : ''}`} />
             </button>
             {membersOpen && (
               <motion.div
@@ -108,12 +108,12 @@ export default function GroupPage() {
                       }`}
                     >
                       <div
-                        className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
+                        className="w-6 h-6 rounded-full flex items-center justify-center text-base font-bold"
                         style={{ backgroundColor: member.color, color: '#000' }}
                       >
                         {member.display_name[0]}
                       </div>
-                      <span className={`text-sm font-medium ${isDropper ? 'text-accent-400' : 'text-white/70'}`}>
+                      <span className={`text-base font-medium ${isDropper ? 'text-accent-400' : 'text-white/70'}`}>
                         {member.display_name}
                       </span>
                     </div>
@@ -124,7 +124,7 @@ export default function GroupPage() {
           </div>
 
           {/* Main content */}
-          <div className="px-6 space-y-6 pb-8">
+          <div className="px-5 space-y-6 pb-8">
             {!spunForGroup ? (
               <SpinTheWheel members={members} dropper={dropper} onComplete={handleSpin} />
             ) : (
@@ -173,8 +173,8 @@ function PreviousDropsPanel({ pastDrops }) {
   return (
     <div>
       <div className="flex items-center gap-2 mb-4">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-white/40">Previous Drops</h3>
-        <span className="text-xs text-white/25 bg-white/[0.04] px-2 py-0.5 rounded-full">{pastDrops.length}</span>
+        <h3 className="text-base font-semibold tracking-tight text-white/40">Recent Drops</h3>
+        <span className="text-base text-white/25 bg-white/[0.04] px-2 py-0.5 rounded-full">{pastDrops.length}</span>
       </div>
       {pastDrops.length > 0 ? (
         <div className="space-y-3">
@@ -183,7 +183,7 @@ function PreviousDropsPanel({ pastDrops }) {
           ))}
         </div>
       ) : (
-        <p className="text-sm text-white/25 text-center py-8">No drops yet</p>
+        <p className="text-base text-white/25 text-center py-8">No drops yet</p>
       )}
     </div>
   )
@@ -294,15 +294,12 @@ function SpinTheWheel({ members, dropper, onComplete }) {
 
             const pathData = `M ${ix1} ${iy1} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${ix1} ${iy1} Z`
 
-            const labelRadius = radius * 0.62
-            const labelX = center + labelRadius * Math.cos(midRad)
-            const labelY = center + labelRadius * Math.sin(midRad)
-
-            const nameRadius = radius * 0.42
+            const nameRadius = radius * 0.58
             const nameX = center + nameRadius * Math.cos(midRad)
             const nameY = center + nameRadius * Math.sin(midRad)
 
             const segOpacity = i % 2 === 0 ? 0.18 : 0.10
+            const midAngleDeg = (startAngle + endAngle) / 2
 
             return (
               <g key={member.id}>
@@ -322,34 +319,20 @@ function SpinTheWheel({ members, dropper, onComplete }) {
                   stroke="rgba(255,255,255,0.06)"
                   strokeWidth="0.5"
                 />
-                {/* Member initial */}
+                {/* Member name */}
                 <text
-                  x={labelX}
-                  y={labelY}
+                  x={nameX}
+                  y={nameY}
                   textAnchor="middle"
                   dominantBaseline="central"
-                  fontSize="18"
-                  fontWeight="700"
+                  fontSize="16"
+                  fontWeight="600"
                   fill={member.color}
-                  fillOpacity="0.9"
+                  fillOpacity="0.85"
+                  transform={`rotate(${midAngleDeg}, ${nameX}, ${nameY})`}
                 >
-                  {member.display_name[0]}
+                  {member.display_name}
                 </text>
-                {/* Name */}
-                {segAngle > 25 && (
-                  <text
-                    x={nameX}
-                    y={nameY}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fontSize="9"
-                    fontWeight="500"
-                    fill="rgba(255,255,255,0.35)"
-                    transform={`rotate(${(startAngle + endAngle) / 2}, ${nameX}, ${nameY})`}
-                  >
-                    {member.display_name.length > 8 ? member.display_name.slice(0, 7) + '\u2026' : member.display_name}
-                  </text>
-                )}
               </g>
             )
           })}
@@ -383,10 +366,10 @@ function SpinTheWheel({ members, dropper, onComplete }) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               className="space-y-3"
             >
-              <p className="text-[11px] text-white/35 uppercase tracking-[0.2em] font-medium">Today's dropper</p>
+              <p className="text-base text-white/35 font-medium">Today's dropper</p>
               <div className="flex items-center justify-center gap-3">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-base font-bold"
                   style={{ backgroundColor: dropper.color, color: '#000' }}
                 >
                   {dropper.display_name[0]}
@@ -406,7 +389,7 @@ function SpinTheWheel({ members, dropper, onComplete }) {
               whileTap={{ scale: 0.97 }}
               onClick={handleSpin}
               disabled={spinning}
-              className={`px-10 py-3.5 rounded-full font-semibold text-sm transition-all ${
+              className={`px-10 py-3.5 rounded-full font-semibold text-base transition-all ${
                 spinning
                   ? 'bg-white/[0.04] text-white/30 cursor-not-allowed border border-white/[0.06]'
                   : 'bg-accent-600 hover:bg-accent-500 text-white shadow-lg shadow-accent-600/20 border border-accent-500/20'
@@ -415,7 +398,7 @@ function SpinTheWheel({ members, dropper, onComplete }) {
               {spinning ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
-                  Spinning\u2026
+                  Spinning{'\u2026'}
                 </span>
               ) : 'Spin the Wheel'}
             </motion.button>
@@ -431,7 +414,7 @@ function ShotclockDisplay({ shotclock }) {
   if (!shotclock.active) {
     return (
       <div className="bg-white/[0.03] rounded-xl p-4 text-center border border-white/[0.04]">
-        <p className="text-sm text-white/40">{shotclock.remaining}</p>
+        <p className="text-base text-white/40">{shotclock.remaining}</p>
       </div>
     )
   }
@@ -441,8 +424,8 @@ function ShotclockDisplay({ shotclock }) {
   return (
     <div className="bg-white/[0.02] rounded-2xl p-5 border border-white/[0.04]">
       <div className="flex items-center justify-center gap-1.5 mb-3">
-        <Clock size={12} className="text-white/30" />
-        <span className="text-[11px] font-medium uppercase tracking-[0.15em] text-white/30">Time Remaining</span>
+        <Clock size={16} className="text-white/30" />
+        <span className="text-base font-medium text-white/30">Time Remaining</span>
       </div>
       <div className="flex items-center justify-center gap-3">
         <TimeUnit value={pad(shotclock.hours)} label="HR" />
@@ -459,7 +442,7 @@ function TimeUnit({ value, label }) {
   return (
     <div className="text-center">
       <p className="text-3xl font-bold text-white/90 font-mono tracking-wider">{value}</p>
-      <p className="text-[10px] font-medium uppercase tracking-[0.15em] text-white/25 mt-0.5">{label}</p>
+      <p className="text-base font-medium text-white/25 mt-0.5">{label}</p>
     </div>
   )
 }
@@ -478,20 +461,20 @@ function YourTurnState({ group, navigate, shotclock, user }) {
         <div className="absolute top-0 right-0 w-32 h-32 bg-accent-600/8 rounded-full blur-3xl -translate-y-8 translate-x-8" />
         <div className="relative">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-accent-400 animate-pulse" />
-            <span className="text-[11px] font-semibold text-accent-400 uppercase tracking-[0.15em]">Your Turn</span>
+            <div className="w-2 h-2 rounded-full bg-accent-400 animate-pulse" />
+            <span className="text-base font-semibold text-accent-400">Your Turn</span>
           </div>
           <h2 className="text-lg font-bold text-white mb-1">{displayName}, it's your day to drop</h2>
-          <p className="text-sm text-white/50 mb-5">
+          <p className="text-base text-white/50 mb-5">
             Search for a song and share it with the group.
           </p>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate(`/group/${group.id}/drop`)}
-            className="flex items-center justify-center gap-2 w-full bg-accent-600 hover:bg-accent-500 text-white font-semibold rounded-xl py-3.5 text-sm transition-colors"
+            className="flex items-center justify-center gap-2 w-full bg-accent-600 hover:bg-accent-500 text-white font-semibold rounded-xl py-3.5 text-base transition-colors"
           >
-            <SearchIcon size={15} />
+            <SearchIcon size={16} />
             Search & Drop
           </motion.button>
         </div>
@@ -514,8 +497,8 @@ function DroppedState({ group }) {
       className="space-y-4"
     >
       <div className="flex items-center gap-2">
-        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-        <span className="text-[11px] font-semibold text-emerald-400 uppercase tracking-[0.15em]">Today's Drop</span>
+        <div className="w-2 h-2 rounded-full bg-emerald-400" />
+        <span className="text-base font-semibold text-emerald-400">Today's Drop</span>
       </div>
 
       <div
@@ -535,26 +518,26 @@ function DroppedState({ group }) {
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-5">
             <h2 className="text-2xl font-bold text-white mb-0.5">{song.title}</h2>
-            <p className="text-white/60">{song.artist}</p>
+            <p className="text-base text-white/60">{song.artist}</p>
           </div>
         </div>
 
         <div className="p-5 space-y-4">
           <div className="flex items-center gap-2.5">
             <div
-              className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold"
+              className="w-7 h-7 rounded-full flex items-center justify-center text-base font-bold"
               style={{ backgroundColor: dropper.color, color: '#000' }}
             >
               {dropper.display_name[0]}
             </div>
             <div>
-              <p className="text-sm font-medium text-white/80">{dropper.display_name}</p>
-              <p className="text-xs text-white/35">{formatTimeAgo(drop.submitted_at)}</p>
+              <p className="text-base font-medium text-white/80">{dropper.display_name}</p>
+              <p className="text-base text-white/35">{formatTimeAgo(drop.submitted_at)}</p>
             </div>
           </div>
 
           {drop.caption && (
-            <p className="text-sm text-white/50 italic leading-relaxed">"{drop.caption}"</p>
+            <p className="text-base text-white/50 italic leading-relaxed">{'"'}{drop.caption}{'"'}</p>
           )}
 
           <div className="flex items-center gap-2 flex-wrap">
@@ -563,9 +546,9 @@ function DroppedState({ group }) {
                 href={song.spotify_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs bg-white/[0.06] text-white/60 px-4 py-2 rounded-lg font-medium hover:bg-white/[0.10] transition-colors border border-white/[0.06]"
+                className="inline-flex items-center gap-1.5 text-base bg-white/[0.06] text-white/60 px-4 py-2 rounded-lg font-medium hover:bg-white/[0.10] transition-colors border border-white/[0.06]"
               >
-                <ExternalLink size={11} />
+                <ExternalLink size={16} />
                 Spotify
               </a>
             )}
@@ -573,9 +556,9 @@ function DroppedState({ group }) {
               href={`https://music.apple.com/us/search?term=${encodeURIComponent(song.title + ' ' + song.artist)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs bg-white/[0.06] text-white/60 px-4 py-2 rounded-lg font-medium hover:bg-white/[0.10] transition-colors border border-white/[0.06]"
+              className="inline-flex items-center gap-1.5 text-base bg-white/[0.06] text-white/60 px-4 py-2 rounded-lg font-medium hover:bg-white/[0.10] transition-colors border border-white/[0.06]"
             >
-              <ExternalLink size={11} />
+              <ExternalLink size={16} />
               Apple Music
             </a>
           </div>
@@ -616,7 +599,7 @@ function WaitingState({ group, dropper, shotclock }) {
           <h2 className="text-lg font-bold text-white mb-1">
             Waiting for {dropper.display_name}
           </h2>
-          <p className="text-sm text-white/40">
+          <p className="text-base text-white/40">
             {shotclock.active ? `${shotclock.remaining} left on the clock` : shotclock.remaining}
           </p>
         </div>
