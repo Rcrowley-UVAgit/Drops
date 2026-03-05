@@ -41,8 +41,11 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06 }}
-      className="relative rounded-xl overflow-hidden bg-[#0a0a0a]/80"
-      style={{ border: `1.5px solid ${dropper.color}` }}
+      className="relative rounded-xl overflow-hidden"
+      style={{
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+        border: '1px solid rgba(255,255,255,0.08)',
+      }}
     >
       <div className="flex gap-3.5 p-4">
         <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0 bg-white/[0.04]">
