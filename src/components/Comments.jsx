@@ -30,24 +30,17 @@ export default function Comments({ comments = [], dropId }) {
             key={comment.id}
             initial={i >= comments.length ? { opacity: 0, y: 8 } : false}
             animate={{ opacity: 1, y: 0 }}
-            className="flex gap-2"
+            className="min-w-0"
           >
-            <div
-              className="w-5 h-5 rounded-full flex items-center justify-center text-base font-bold shrink-0"
-              style={{ backgroundColor: commenter.color + '33', color: commenter.color }}
-            >
-              {commenter.display_name[0]}
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-base font-medium" style={{ color: commenter.color }}>{commenter.display_name}</span>
+              <span className="text-base text-white/25">{formatTimeAgo(comment.created_at)}</span>
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-base font-semibold text-white">{commenter.display_name}</span>
-                <span className="text-base text-white/40">{formatTimeAgo(comment.created_at)}</span>
-              </div>
-              <p className="text-base text-white/70 break-words">{comment.body}</p>
-            </div>
+            <p className="text-base text-white/60 break-words">{comment.body}</p>
           </motion.div>
         )
       })}
+
       <form onSubmit={handleSubmit} className="flex gap-2 pt-1">
         <input
           type="text"
