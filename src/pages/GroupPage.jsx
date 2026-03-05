@@ -58,6 +58,10 @@ export default function GroupPage() {
 
   const rightPct = 100 - centerPct
 
+  /* Determine if the wheel should be shown:
+     - Only show if drop_status is NOT 'dropped' AND the user hasn't spun yet for this group */
+  const showWheel = group.drop_status !== 'dropped' && !spunForGroup
+
   return (
     <div ref={containerRef} className="flex h-full">
       {/* CENTER PANE */}
@@ -121,15 +125,19 @@ export default function GroupPage() {
 
           {/* Main content */}
           <div className="px-5 space-y-6 pb-8">
-            {!spunForGroup ? (
+            {showWheel ? (
               <SpinTheWheel members={members} dropper={dropper} onComplete={handleSpin} />
             ) : (
               <>
                 {group.drop_status !== 'dropped' && (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}>
                     <ShotclockDisplay shotclock={shotclock} />
                   </motion.div>
                 )}
+
                 {group.drop_status === 'your_turn' && <YourTurnState group={group} navigate={navigate} shotclock={shotclock} user={user} />}
                 {group.drop_status === 'dropped' && <DroppedState group={group} />}
                 {group.drop_status === 'waiting' && <WaitingState group={group} dropper={dropper} shotclock={shotclock} />}
@@ -199,8 +207,8 @@ function SpinTheWheel({ members, dropper, onComplete }) {
     const fullSpins = 6 + Math.floor(Math.random() * 4)
     const targetOffset = -(dropperIndex * segAngle) - segAngle / 2
     const totalRotation = rotation + fullSpins * 360 + ((targetOffset - rotation % 360 + 720) % 360)
-    setRotation(totalRotation)
 
+    setRotation(totalRotation)
     setTimeout(() => {
       setSpinning(false)
       setLanded(true)
@@ -275,6 +283,7 @@ function SpinTheWheel({ members, dropper, onComplete }) {
             const nameX = center + nameRadius * Math.cos(midRad)
             const nameY = center + nameRadius * Math.sin(midRad)
             const midAngleDeg = (startAngle + endAngle) / 2
+
             /* Flip text that would be upside down */
             const textRotation = (midAngleDeg > 90 && midAngleDeg < 270) ? midAngleDeg + 180 : midAngleDeg
 
@@ -414,7 +423,6 @@ function TimeUnit({ value, label }) {
 /* STATE: Your Turn */
 function YourTurnState({ group, navigate, shotclock, user }) {
   const displayName = user?.display_name || 'You'
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -464,11 +472,13 @@ function DroppedState({ group }) {
         <div className="w-2 h-2 rounded-full bg-emerald-400" />
         <span className="text-base font-semibold text-emerald-400">Today's Drop</span>
       </div>
+
       <div
         className="relative overflow-hidden rounded-2xl border border-white/[0.06]"
         style={{ background: `linear-gradient(135deg, ${dropper.color}12 0%, ${dropper.color}06 30%, #0a0a0a 60%)` }}
       >
         <div className="absolute top-0 left-0 right-0 h-px" style={{ backgroundColor: dropper.color, opacity: 0.3 }} />
+
         <div className="relative aspect-square max-h-80 overflow-hidden">
           {song.album_art ? (
             <img src={song.album_art} alt={song.title} className="w-full h-full object-cover" />
@@ -491,21 +501,19 @@ function DroppedState({ group }) {
               <p className="text-base text-white/35">{formatTimeAgo(drop.submitted_at)}</p>
             </div>
           </div>
-
           {drop.caption && (
             <p className="text-base text-white/50 italic leading-relaxed">{'"'}{drop.caption}{'"'}</p>
           )}
-
           <div className="flex items-center gap-2 flex-wrap">
             {song.spotify_url && (
-              <a href={song.spotify_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-base bg-white/[0.06] text-white/60 px-4 py-2 rounded-lg font-medium hover:bg-white/[0.10] transition-colors border border-white/[0.06]">
-                <ExternalLink size={16} />
-                Spotify
+              <a href={song.spotify_url} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-base bg-white/[0.06] text-white/60 px-4 py-2 rounded-lg font-medium hover:bg-white/[0.10] transition-colors border border-white/[0.06]">
+                <ExternalLink size={16} /> Spotify
               </a>
             )}
-            <a href={`https://music.apple.com/us/search?term=${encodeURIComponent(song.title + ' ' + song.artist)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-base bg-white/[0.06] text-white/60 px-4 py-2 rounded-lg font-medium hover:bg-white/[0.10] transition-colors border border-white/[0.06]">
-              <ExternalLink size={16} />
-              Apple Music
+            <a href={`https://music.apple.com/us/search?term=${encodeURIComponent(song.title + ' ' + song.artist)}`} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-base bg-white/[0.06] text-white/60 px-4 py-2 rounded-lg font-medium hover:bg-white/[0.10] transition-colors border border-white/[0.06]">
+              <ExternalLink size={16} /> Apple Music
             </a>
           </div>
           <DropCard drop={drop} reactionsOnly />
@@ -536,7 +544,10 @@ function WaitingState({ group, dropper, shotclock }) {
             >
               {dropper.display_name[0]}
             </div>
-            <div className="absolute inset-0 rounded-full animate-ping opacity-15" style={{ backgroundColor: dropper.color }} />
+            <div
+              className="absolute inset-0 rounded-full animate-ping opacity-15"
+              style={{ backgroundColor: dropper.color }}
+            />
           </div>
           <h2 className="text-lg font-bold text-white mb-1">
             Waiting for {dropper.display_name}
