@@ -42,7 +42,7 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06 }}
       className="relative rounded-xl overflow-hidden bg-[#0a0a0a]/80"
-      style={{ borderLeft: `3px solid ${dropper.color}40` }}
+      style={{ border: `1.5px solid ${dropper.color}` }}
     >
       <div className="flex gap-3.5 p-4">
         <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0 bg-white/[0.04]">
@@ -54,7 +54,6 @@ export default function DropCard({ drop, index = 0, reactionsOnly = false }) {
             </div>
           )}
         </div>
-
         <div className="flex-1 min-w-0">
           <h4 className="text-base font-semibold text-white truncate">{song.title}</h4>
           <p className="text-base text-white/45 truncate">{song.artist}</p>
