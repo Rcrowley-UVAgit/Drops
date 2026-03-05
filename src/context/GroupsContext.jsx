@@ -20,6 +20,7 @@ export function GroupsProvider({ children }) {
       comments: [],
     }
 
+    // Update group: set today_drop and flip status to 'dropped'
     setGroups(prev =>
       prev.map(g =>
         g.id === groupId
@@ -28,10 +29,9 @@ export function GroupsProvider({ children }) {
       )
     )
 
-    setPastDrops(prev => ({
-      ...prev,
-      [groupId]: [{ ...newDrop, drop_date: new Date().toISOString().split('T')[0] }, ...(prev[groupId] || [])],
-    }))
+    // Note: We do NOT add to pastDrops here because GroupPage's allDrops
+    // already includes today_drop at the top. The drop will move to
+    // pastDrops when the day rolls over (in a real backend).
 
     return newDrop
   }, [])
@@ -89,7 +89,10 @@ export function GroupsProvider({ children }) {
       prev.map(g => {
         if (g.id !== groupId || !g.today_drop) return g
         if (g.today_drop.id === dropId) {
-          return { ...g, today_drop: { ...g.today_drop, comments: [...g.today_drop.comments, newComment] } }
+          return {
+            ...g,
+            today_drop: { ...g.today_drop, comments: [...g.today_drop.comments, newComment] }
+          }
         }
         return g
       })
