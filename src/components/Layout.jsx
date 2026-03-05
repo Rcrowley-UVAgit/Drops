@@ -9,6 +9,15 @@ const MOBILE_NAV = [
   { path: '/profile', icon: User, label: 'Profile' },
 ]
 
+function DropLogo({ size = 24 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0c0-4.5-7-13-7-13z" fill="white" />
+      <ellipse cx="10.5" cy="16" rx="2" ry="2.5" fill="#060606" opacity="0.35" />
+    </svg>
+  )
+}
+
 export default function Layout({ children }) {
   const location = useLocation()
   const navigate = useNavigate()
@@ -16,9 +25,10 @@ export default function Layout({ children }) {
   return (
     <div className="flex flex-col h-full bg-[#060606]">
       {/* Top Banner */}
-      <header className="hidden md:flex items-center px-6 py-5 border-b border-white/[0.06] bg-[#060606] shrink-0">
-        <button onClick={() => navigate('/group/uw-lads')} className="flex items-center group">
-          <span style={{ fontSize: '28px', fontWeight: 600, letterSpacing: '0.08em', color: 'white', fontFamily: "'DM Sans', sans-serif" }}>drops</span>
+      <header className="hidden md:flex items-center px-6 py-4 border-b border-white/[0.06] bg-[#060606] shrink-0">
+        <button onClick={() => navigate('/group/uw-lads')} className="flex items-center gap-2.5 group">
+          <DropLogo size={26} />
+          <span style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em', color: 'white', fontFamily: "'DM Sans', sans-serif" }}>drops</span>
         </button>
       </header>
 
