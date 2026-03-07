@@ -189,12 +189,11 @@ function VaultPanel({ drops }) {
   )
 }
 
-/* Spin the Wheel */
+/* Spin the Record — turntable-style spinner */
 function SpinTheWheel({ members, dropper, onComplete }) {
   const [spinning, setSpinning] = useState(false)
   const [rotation, setRotation] = useState(0)
   const [landed, setLanded] = useState(false)
-  const wheelRef = useRef(null)
 
   const segAngle = 360 / members.length
 
@@ -216,121 +215,191 @@ function SpinTheWheel({ members, dropper, onComplete }) {
     }, 7200)
   }
 
-  const wheelSize = 380
-  const center = wheelSize / 2
-  const radius = wheelSize / 2 - 6
+  /* Turntable dimensions — low-angle 3D perspective via ellipses.
+     We use a wide SVG viewBox and squash Y to ~45% to get the
+     low-angle look from the reference photo. */
+  const W = 520
+  const H = 300
+  const cx = W / 2
+  const cy = 155          /* vertical center of the record */
+  const rx = 220          /* horizontal radius of record */
+  const ry = 75           /* vertical radius (perspective squash) */
+  const ratio = ry / rx   /* ellipse squash factor for point mapping */
+
+  /* Map a circular angle + radius onto the perspective ellipse */
+  const eX = (angle, r) => cx + r * Math.cos(angle)
+  const eY = (angle, r) => cy + r * ratio * Math.sin(angle)
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center py-6"
+      className="flex flex-col items-center py-4"
     >
-      {/* Wheel container */}
-      <div className="relative" style={{ width: wheelSize, height: wheelSize }}>
-        {/* Subtle outer glow */}
+      {/* Turntable */}
+      <div className="relative w-full" style={{ maxWidth: W }}>
+        {/* Subtle glow under the turntable */}
         <div
-          className="absolute -inset-3 rounded-full opacity-40 blur-2xl transition-all duration-1000"
+          className="absolute left-1/2 -translate-x-1/2 bottom-0 w-3/4 h-16 blur-3xl opacity-30 transition-all duration-1000 rounded-full"
           style={{
             background: landed
-              ? `radial-gradient(circle, ${dropper.color}30, transparent 70%)`
-              : 'radial-gradient(circle, rgba(139,92,246,0.08), transparent 70%)'
+              ? `radial-gradient(ellipse, ${dropper.color}50, transparent 70%)`
+              : 'radial-gradient(ellipse, rgba(139,92,246,0.15), transparent 70%)'
           }}
         />
 
-        {/* Spinning wheel */}
-        <svg
-          ref={wheelRef}
-          width={wheelSize}
-          height={wheelSize}
-          className="absolute inset-0"
-          style={{
-            transform: `rotate(${rotation}deg)`,
-            transition: spinning ? 'transform 7s cubic-bezier(0.15, 0.60, 0.08, 1.0)' : 'none'
-          }}
-        >
-          {/* Definitions for gradients */}
+        <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ overflow: 'visible' }}>
           <defs>
+            {/* Wood base gradient */}
+            <linearGradient id="rp-wood" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#a0673f" />
+              <stop offset="40%" stopColor="#8b5e3c" />
+              <stop offset="100%" stopColor="#5a3322" />
+            </linearGradient>
+            {/* Silver rim */}
+            <linearGradient id="rp-rim" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#d4d4d4" />
+              <stop offset="50%" stopColor="#a0a0a0" />
+              <stop offset="100%" stopColor="#808080" />
+            </linearGradient>
+            {/* Vinyl shine */}
+            <radialGradient id="rp-shine" cx="40%" cy="35%" r="50%">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.07)" />
+              <stop offset="100%" stopColor="transparent" />
+            </radialGradient>
+            {/* Label gradient */}
+            <radialGradient id="rp-label" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#999" />
+              <stop offset="100%" stopColor="#777" />
+            </radialGradient>
+            {/* Spindle */}
+            <linearGradient id="rp-spindle" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#c4875a" />
+              <stop offset="100%" stopColor="#8b5e3c" />
+            </linearGradient>
+            {/* Segment gradients */}
             {members.map((member, i) => (
-              <radialGradient key={`grad-${i}`} id={`seg-grad-${i}`} cx="50%" cy="50%" r="50%">
-                <stop offset="30%" stopColor={member.color} stopOpacity={i % 2 === 0 ? 0.28 : 0.18} />
-                <stop offset="100%" stopColor={member.color} stopOpacity={i % 2 === 0 ? 0.12 : 0.06} />
+              <radialGradient key={`sg-${i}`} id={`rp-seg-${i}`} cx="50%" cy="50%" r="50%">
+                <stop offset="20%" stopColor={member.color} stopOpacity={0.35} />
+                <stop offset="100%" stopColor={member.color} stopOpacity={0.10} />
               </radialGradient>
             ))}
           </defs>
 
-          {members.map((member, i) => {
-            const startAngle = i * segAngle - 90
-            const endAngle = startAngle + segAngle
-            const startRad = (startAngle * Math.PI) / 180
-            const endRad = (endAngle * Math.PI) / 180
-            const midRad = ((startAngle + endAngle) / 2 * Math.PI) / 180
-            const innerRadius = 50
+          {/* === WOOD BASE === */}
+          {/* Side of the base (visible thickness) */}
+          <ellipse cx={cx} cy={cy + 28} rx={rx + 14} ry={ry + 12} fill="url(#rp-wood)" />
+          {/* Wood grain overlay */}
+          <ellipse cx={cx} cy={cy + 28} rx={rx + 14} ry={ry + 12} fill="none" stroke="rgba(0,0,0,0.12)" strokeWidth="0.5" />
 
-            const x1 = center + radius * Math.cos(startRad)
-            const y1 = center + radius * Math.sin(startRad)
-            const x2 = center + radius * Math.cos(endRad)
-            const y2 = center + radius * Math.sin(endRad)
-            const ix1 = center + innerRadius * Math.cos(startRad)
-            const iy1 = center + innerRadius * Math.sin(startRad)
-            const ix2 = center + innerRadius * Math.cos(endRad)
-            const iy2 = center + innerRadius * Math.sin(endRad)
-            const largeArc = segAngle > 180 ? 1 : 0
+          {/* === SILVER RIM === */}
+          <ellipse cx={cx} cy={cy + 10} rx={rx + 14} ry={ry + 8} fill="url(#rp-rim)" />
+          {/* Rim highlight */}
+          <ellipse cx={cx} cy={cy + 8} rx={rx + 12} ry={ry + 6} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="0.5" />
 
-            const pathData = `M ${ix1} ${iy1} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${ix1} ${iy1} Z`
+          {/* === SPINNING RECORD GROUP === */}
+          <g style={{
+            transformOrigin: `${cx}px ${cy}px`,
+            transform: `rotate(${rotation}deg)`,
+            transition: spinning ? 'transform 7s cubic-bezier(0.15, 0.60, 0.08, 1.0)' : 'none'
+          }}>
+            {/* Black vinyl base */}
+            <ellipse cx={cx} cy={cy} rx={rx + 6} ry={ry + 2} fill="#111" />
 
-            const nameRadius = radius * 0.62
-            const nameX = center + nameRadius * Math.cos(midRad)
-            const nameY = center + nameRadius * Math.sin(midRad)
-            const midAngleDeg = (startAngle + endAngle) / 2
+            {/* Record grooves */}
+            {[0.95, 0.88, 0.81, 0.74, 0.67, 0.60, 0.53, 0.46, 0.39].map((f, i) => (
+              <ellipse key={`groove-${i}`} cx={cx} cy={cy} rx={rx * f} ry={ry * f}
+                fill="none" stroke={i % 2 === 0 ? '#1a1a1a' : '#1f1f1f'} strokeWidth="0.6" />
+            ))}
 
-            /* Flip text that would be upside down */
-            const textRotation = (midAngleDeg > 90 && midAngleDeg < 270) ? midAngleDeg + 180 : midAngleDeg
+            {/* Colored member segments on the vinyl */}
+            {members.map((member, i) => {
+              const startAngle = (i * segAngle - 90) * Math.PI / 180
+              const endAngle = ((i + 1) * segAngle - 90) * Math.PI / 180
+              const midAngle = (startAngle + endAngle) / 2
+              const outerR = rx * 0.92
+              const innerR = 42
+              const largeArc = segAngle > 180 ? 1 : 0
 
-            return (
-              <g key={member.id}>
-                <path d={pathData} fill={`url(#seg-grad-${i})`} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-                {/* Member name */}
-                <text
-                  x={nameX} y={nameY}
-                  textAnchor="middle" dominantBaseline="central"
-                  fontSize="15" fontWeight="600"
-                  fill={member.color} fillOpacity="0.9"
-                  transform={`rotate(${textRotation}, ${nameX}, ${nameY})`}
-                >
-                  {member.display_name}
-                </text>
-              </g>
-            )
-          })}
+              /* Build path with elliptical arcs */
+              const ox1 = cx + outerR * Math.cos(startAngle)
+              const oy1 = cy + outerR * ratio * Math.sin(startAngle)
+              const ox2 = cx + outerR * Math.cos(endAngle)
+              const oy2 = cy + outerR * ratio * Math.sin(endAngle)
+              const ix1 = cx + innerR * Math.cos(startAngle)
+              const iy1 = cy + innerR * ratio * Math.sin(startAngle)
+              const ix2 = cx + innerR * Math.cos(endAngle)
+              const iy2 = cy + innerR * ratio * Math.sin(endAngle)
+              const outerRy = outerR * ratio
+              const innerRy = innerR * ratio
 
-          {/* Center hub */}
-          <circle cx={center} cy={center} r={48} fill="#0e0e0e" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-          <circle cx={center} cy={center} r={46} fill="none" stroke="rgba(139,92,246,0.15)" strokeWidth="0.5" />
-          <text x={center} y={center - 6} textAnchor="middle" dominantBaseline="central" fontSize="20" fill="rgba(139,92,246,0.5)">
-            {'\u266B'}
-          </text>
-          <text x={center} y={center + 14} textAnchor="middle" dominantBaseline="central" fontSize="10" fontWeight="500" fill="rgba(255,255,255,0.2)">
-            DROP
-          </text>
-        </svg>
+              const path = `M ${ix1} ${iy1} L ${ox1} ${oy1} A ${outerR} ${outerRy} 0 ${largeArc} 1 ${ox2} ${oy2} L ${ix2} ${iy2} A ${innerR} ${innerRy} 0 ${largeArc} 0 ${ix1} ${iy1} Z`
 
-        {/* Pointer at top */}
-        <div className="absolute left-1/2 -top-1 -translate-x-1/2 z-10">
-          <div
-            className="w-0 h-0"
-            style={{
-              borderLeft: '9px solid transparent',
-              borderRight: '9px solid transparent',
-              borderTop: '16px solid #7C3AED',
-              filter: 'drop-shadow(0 2px 6px rgba(124,58,237,0.4))'
-            }}
+              /* Name position */
+              const nameR = outerR * 0.65
+              const nameX = cx + nameR * Math.cos(midAngle)
+              const nameY = cy + nameR * ratio * Math.sin(midAngle)
+
+              /* Rotate text to follow the segment angle, accounting for perspective */
+              const textDeg = midAngle * 180 / Math.PI
+              const flip = (textDeg > 90 && textDeg < 270) ? textDeg + 180 : textDeg
+
+              return (
+                <g key={member.id}>
+                  <path d={path} fill={`url(#rp-seg-${i})`} stroke="rgba(255,255,255,0.04)" strokeWidth="0.5" />
+                  <text
+                    x={nameX} y={nameY}
+                    textAnchor="middle" dominantBaseline="central"
+                    fontSize="13" fontWeight="600" letterSpacing="0.5"
+                    fill={member.color} fillOpacity="0.9"
+                    transform={`rotate(${flip}, ${nameX}, ${nameY})`}
+                  >
+                    {member.display_name}
+                  </text>
+                </g>
+              )
+            })}
+
+            {/* Vinyl light reflection overlay */}
+            <ellipse cx={cx} cy={cy} rx={rx + 6} ry={ry + 2} fill="url(#rp-shine)" />
+
+            {/* Center label */}
+            <ellipse cx={cx} cy={cy} rx={36} ry={36 * ratio} fill="url(#rp-label)" />
+            <ellipse cx={cx} cy={cy} rx={36} ry={36 * ratio} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5" />
+
+            {/* Label text — music note + DROP */}
+            <text x={cx} y={cy - 4} textAnchor="middle" dominantBaseline="central" fontSize="16" fill="rgba(255,255,255,0.4)">
+              {'\u266B'}
+            </text>
+            <text x={cx} y={cy + 10} textAnchor="middle" dominantBaseline="central" fontSize="8" fontWeight="600" letterSpacing="1" fill="rgba(255,255,255,0.2)">
+              DROP
+            </text>
+          </g>
+
+          {/* === SPINDLE (on top, doesn't rotate) === */}
+          <ellipse cx={cx} cy={cy} rx={5} ry={5 * ratio} fill="#a0522d" />
+          <rect x={cx - 3} y={cy - 22} width={6} height={22} rx={3} fill="url(#rp-spindle)" />
+          <ellipse cx={cx} cy={cy - 22} rx={3} ry={1.5} fill="#c4875a" />
+
+          {/* === TONEARM / POINTER === */}
+          <line
+            x1={cx + rx + 30} y1={cy - ry - 20}
+            x2={cx + rx * 0.15} y2={cy - ry * 0.85}
+            stroke="#888" strokeWidth="2.5" strokeLinecap="round"
           />
-        </div>
+          {/* Tonearm head */}
+          <line
+            x1={cx + rx * 0.15} y1={cy - ry * 0.85}
+            x2={cx + rx * 0.08} y2={cy - ry * 0.70}
+            stroke="#aaa" strokeWidth="4" strokeLinecap="round"
+          />
+          {/* Tonearm pivot */}
+          <circle cx={cx + rx + 30} cy={cy - ry - 20} r={5} fill="#666" stroke="#888" strokeWidth="1" />
+        </svg>
       </div>
 
       {/* Result / Button area */}
-      <div className="mt-8 text-center">
+      <div className="mt-6 text-center">
         <AnimatePresence mode="wait">
           {landed ? (
             <motion.div
