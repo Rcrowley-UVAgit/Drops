@@ -3,50 +3,69 @@ import { supabase } from './supabase'
 // ─── Auth & Onboarding ───────────────────────────────────────
 
 export async function joinWithCode(inviteCode, displayName) {
-  console.log('[JOIN] Starting joinWithCode...')
+  console.log('[JOIN] Starting...')
 
   // 1. Sign in anonymously
-  let authData, authErr
-  try {
-    console.log('[JOIN] Calling signInAnonymously...')
-    const result = await supabase.auth.signInAnonymously()
-    console.log('[JOIN] signInAnonymously result:', result.error ? 'ERROR: ' + result.error.message : 'OK')
-    authData = result.data
-    authErr = result.error
-  } catch (e) {
-    console.error('[JOIN] signInAnonymously threw:', e)
-    return { error: { message: e.message || 'Failed to connect. Check your internet connection.' } }
+  console.log('[JOIN] signInAnonymously...')
+  const { data: authData, error: authErr } = await supabase.auth.signInAnonymously()
+  if (authErr) {
+    console.error('[JOIN] auth error:', authErr.message)
+    return { error: authErr }
   }
-  if (authErr) return { error: authErr }
+  const userId = authData.user.id
+  console.log('[JOIN] auth OK, userId:', userId)
 
-  // 2. Call server-side function that handles profile + group join (bypasses RLS)
-  let data, error
-  try {
-    console.log('[JOIN] Calling RPC join_group_with_code...')
-    const result = await supabase.rpc('join_group_with_code', {
-      p_invite_code: inviteCode,
-      p_display_name: displayName,
-    })
-    console.log('[JOIN] RPC result:', result.error ? 'ERROR: ' + result.error.message : 'OK', result.data)
-    data = result.data
-    error = result.error
-  } catch (e) {
-    console.error('[JOIN] RPC threw:', e)
+  // 2. Find group by invite code
+  console.log('[JOIN] looking up group...')
+  const { data: group, error: groupErr } = await supabase
+    .from('groups')
+    .select('id, name, cycle_order')
+    .ilike('invite_code', inviteCode.trim())
+    .single()
+
+  if (groupErr || !group) {
+    console.error('[JOIN] group lookup failed:', groupErr?.message || 'not found')
     await supabase.auth.signOut()
-    return { error: { message: e.message || 'Failed to join group.' } }
+    return { error: { message: 'Invalid invite code' } }
+  }
+  console.log('[JOIN] group found:', group.name)
+
+  // 3. Update profile display name (trigger already created the row)
+  console.log('[JOIN] updating profile...')
+  const { error: profileErr } = await supabase
+    .from('profiles')
+    .update({ display_name: displayName.trim() })
+    .eq('id', userId)
+
+  if (profileErr) {
+    console.error('[JOIN] profile update error:', profileErr.message)
+    // Non-fatal — continue with join
   }
 
-  if (error) {
+  // 4. Join the group
+  console.log('[JOIN] joining group...')
+  const { error: memberErr } = await supabase
+    .from('group_members')
+    .upsert({ group_id: group.id, user_id: userId, role: 'member' }, { onConflict: 'group_id,user_id' })
+
+  if (memberErr) {
+    console.error('[JOIN] member insert error:', memberErr.message)
     await supabase.auth.signOut()
-    return { error }
+    return { error: memberErr }
   }
 
-  if (data?.error) {
-    await supabase.auth.signOut()
-    return { error: { message: data.error } }
+  // 5. Add to cycle_order if not already present
+  const cycleOrder = group.cycle_order || []
+  if (!cycleOrder.includes(userId)) {
+    console.log('[JOIN] adding to cycle_order...')
+    await supabase
+      .from('groups')
+      .update({ cycle_order: [...cycleOrder, userId] })
+      .eq('id', group.id)
   }
 
-  return { data: { group: { id: data.group_id, name: data.group_name }, userId: data.user_id } }
+  console.log('[JOIN] done!')
+  return { data: { group: { id: group.id, name: group.name }, userId } }
 }
 
 // ─── Profile ─────────────────────────────────────────────────
