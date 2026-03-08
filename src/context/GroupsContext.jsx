@@ -1,111 +1,156 @@
-import { createContext, useContext, useState, useCallback } from 'react'
-import { demoGroups, demoPastDrops, CURRENT_USER } from '../lib/demoData'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { supabase } from '../lib/supabase'
+import { useAuth } from './AuthContext'
+import {
+  fetchUserGroup,
+  fetchTodayDrop,
+  fetchDrops,
+  submitDrop as apiSubmitDrop,
+  toggleReaction as apiToggleReaction,
+  addComment as apiAddComment,
+} from '../lib/api'
 
 const GroupsContext = createContext({})
 
 export function GroupsProvider({ children }) {
-  const [groups, setGroups] = useState(demoGroups)
-  const [pastDrops, setPastDrops] = useState(demoPastDrops)
+  const { user } = useAuth()
+  const [group, setGroup] = useState(null)
+  const [members, setMembers] = useState([])
+  const [todayDrop, setTodayDrop] = useState(null)
+  const [pastDrops, setPastDrops] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  // Submit a drop for the current user in the given group
-  const submitDrop = useCallback((groupId, song, caption, moodTag) => {
-    const newDrop = {
-      id: `drop-${groupId}-${Date.now()}`,
-      user_id: CURRENT_USER.id,
-      song,
-      caption,
-      mood_tag: moodTag || null,
-      submitted_at: new Date().toISOString(),
-      reactions: [],
-      comments: [],
+  // Load group + drops when user is available
+  useEffect(() => {
+    if (!user) {
+      setGroup(null)
+      setMembers([])
+      setTodayDrop(null)
+      setPastDrops([])
+      setLoading(false)
+      return
     }
 
-    // Update group: set today_drop and flip status to 'dropped'
-    setGroups(prev =>
-      prev.map(g =>
-        g.id === groupId
-          ? { ...g, today_drop: newDrop, drop_status: 'dropped' }
-          : g
-      )
-    )
+    let cancelled = false
 
-    // Note: We do NOT add to pastDrops here because GroupPage's allDrops
-    // already includes today_drop at the top. The drop will move to
-    // pastDrops when the day rolls over (in a real backend).
+    async function load() {
+      setLoading(true)
+      const { data: groupData } = await fetchUserGroup()
+      if (cancelled) return
 
-    return newDrop
-  }, [])
+      if (groupData) {
+        setGroup(groupData)
+        setMembers(groupData.members || [])
 
-  // Toggle a reaction on a drop
-  const toggleReaction = useCallback((groupId, dropId, reactionType) => {
-    const toggle = (drops) =>
-      drops.map(d => {
-        if (d.id !== dropId) return d
-        const existing = d.reactions.find(
-          r => r.user_id === CURRENT_USER.id && r.reaction_type === reactionType
-        )
-        return {
-          ...d,
-          reactions: existing
-            ? d.reactions.filter(r => !(r.user_id === CURRENT_USER.id && r.reaction_type === reactionType))
-            : [...d.reactions, { user_id: CURRENT_USER.id, reaction_type: reactionType }],
-        }
-      })
+        const [todayResult, pastResult] = await Promise.all([
+          fetchTodayDrop(groupData.id),
+          fetchDrops(groupData.id),
+        ])
+        if (cancelled) return
 
-    // Update today_drop if it matches
-    setGroups(prev =>
-      prev.map(g => {
-        if (g.id !== groupId || !g.today_drop) return g
-        if (g.today_drop.id === dropId) {
-          const updated = toggle([g.today_drop])[0]
-          return { ...g, today_drop: updated }
-        }
-        return g
-      })
-    )
-
-    // Update past drops
-    setPastDrops(prev => ({
-      ...prev,
-      [groupId]: toggle(prev[groupId] || []),
-    }))
-  }, [])
-
-  // Add a comment to a drop
-  const addComment = useCallback((groupId, dropId, body) => {
-    const newComment = {
-      id: `c-${Date.now()}`,
-      user_id: CURRENT_USER.id,
-      body,
-      created_at: new Date().toISOString(),
+        setTodayDrop(todayResult.data)
+        setPastDrops(pastResult.data || [])
+      }
+      setLoading(false)
     }
 
-    const addToDrops = (drops) =>
-      drops.map(d =>
-        d.id === dropId ? { ...d, comments: [...d.comments, newComment] } : d
-      )
+    load()
+    return () => { cancelled = true }
+  }, [user])
 
-    setGroups(prev =>
-      prev.map(g => {
-        if (g.id !== groupId || !g.today_drop) return g
-        if (g.today_drop.id === dropId) {
-          return {
-            ...g,
-            today_drop: { ...g.today_drop, comments: [...g.today_drop.comments, newComment] }
-          }
-        }
-        return g
+  // Realtime subscriptions
+  useEffect(() => {
+    if (!group) return
+
+    const channel = supabase
+      .channel(`group-${group.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'drops', filter: `group_id=eq.${group.id}` }, async () => {
+        const [todayResult, pastResult] = await Promise.all([
+          fetchTodayDrop(group.id),
+          fetchDrops(group.id),
+        ])
+        setTodayDrop(todayResult.data)
+        setPastDrops(pastResult.data || [])
       })
-    )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reactions' }, async () => {
+        const [todayResult, pastResult] = await Promise.all([
+          fetchTodayDrop(group.id),
+          fetchDrops(group.id),
+        ])
+        setTodayDrop(todayResult.data)
+        setPastDrops(pastResult.data || [])
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, async () => {
+        const [todayResult, pastResult] = await Promise.all([
+          fetchTodayDrop(group.id),
+          fetchDrops(group.id),
+        ])
+        setTodayDrop(todayResult.data)
+        setPastDrops(pastResult.data || [])
+      })
+      .subscribe()
 
-    setPastDrops(prev => ({
-      ...prev,
-      [groupId]: addToDrops(prev[groupId] || []),
-    }))
+    return () => { supabase.removeChannel(channel) }
+  }, [group])
+
+  const submitDrop = useCallback(async (groupId, song, caption, moodTag) => {
+    const { data, error } = await apiSubmitDrop(groupId, song, caption, moodTag)
+    if (!error && data) {
+      setTodayDrop(data)
+    }
+    return { data, error }
   }, [])
+
+  const toggleReaction = useCallback(async (groupId, dropId, reactionType) => {
+    await apiToggleReaction(dropId, reactionType)
+    // Optimistic update: refetch
+    if (group) {
+      const [todayResult, pastResult] = await Promise.all([
+        fetchTodayDrop(group.id),
+        fetchDrops(group.id),
+      ])
+      setTodayDrop(todayResult.data)
+      setPastDrops(pastResult.data || [])
+    }
+  }, [group])
+
+  const addComment = useCallback(async (groupId, dropId, body) => {
+    await apiAddComment(dropId, body)
+    // Refetch
+    if (group) {
+      const [todayResult, pastResult] = await Promise.all([
+        fetchTodayDrop(group.id),
+        fetchDrops(group.id),
+      ])
+      setTodayDrop(todayResult.data)
+      setPastDrops(pastResult.data || [])
+    }
+  }, [group])
+
+  // Provide a compatible API shape
+  const groups = group ? [{
+    id: group.id,
+    name: group.name,
+    members: members,
+    today_dropper: todayDrop?.user_id || null,
+    drop_status: todayDrop ? 'dropped' : 'turntable',
+    today_drop: todayDrop,
+    cycle_index: group.cycle_index || 0,
+    cycle_order: group.cycle_order || [],
+  }] : []
 
   return (
-    <GroupsContext.Provider value={{ groups, pastDrops, submitDrop, toggleReaction, addComment }}>
+    <GroupsContext.Provider value={{
+      group,
+      groups,
+      members,
+      todayDrop,
+      pastDrops,
+      loading: loading,
+      submitDrop,
+      toggleReaction,
+      addComment,
+    }}>
       {children}
     </GroupsContext.Provider>
   )

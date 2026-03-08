@@ -24,8 +24,12 @@ export default function DropSubmission() {
   const handleSubmit = async () => {
     if (!selectedSong) return
     setSubmitting(true)
-    await new Promise(r => setTimeout(r, 1000))
-    submitDrop(groupId, selectedSong, caption, moodTag)
+    const { error } = await submitDrop(groupId, selectedSong, caption, moodTag)
+    if (error) {
+      console.error('Drop failed:', error)
+      setSubmitting(false)
+      return
+    }
     setSubmitted(true)
     setTimeout(() => navigate(`/group/${groupId}`), 2500)
   }
@@ -36,14 +40,16 @@ export default function DropSubmission() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="min-h-screen flex flex-col items-center justify-center px-6 text-center"
+        style={{ background: 'var(--bg)' }}
       >
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
-          className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mb-6"
+          className="w-16 h-16 rounded-full flex items-center justify-center mb-6"
+          style={{ background: 'rgba(34, 197, 94, 0.15)' }}
         >
-          <Check size={32} className="text-green-400" />
+          <Check size={32} className="text-green-500" />
         </motion.div>
         {selectedSong?.album_art && (
           <motion.img
@@ -52,14 +58,15 @@ export default function DropSubmission() {
             transition={{ delay: 0.3 }}
             src={selectedSong.album_art}
             alt=""
-            className="w-40 h-40 rounded-2xl shadow-2xl shadow-amber-500/10 mb-5"
+            className="w-40 h-40 rounded-2xl shadow-2xl mb-5"
           />
         )}
         <motion.h2
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-xl font-bold text-white mb-1"
+          className="text-xl font-bold mb-1"
+          style={{ color: 'var(--charcoal)' }}
         >
           Drop is live
         </motion.h2>
@@ -67,7 +74,8 @@ export default function DropSubmission() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="text-base text-white/60"
+          className="text-base"
+          style={{ color: 'var(--text-secondary)' }}
         >
           {selectedSong?.title} by {selectedSong?.artist}
         </motion.p>
@@ -76,7 +84,7 @@ export default function DropSubmission() {
   }
 
   return (
-    <div className="max-w-lg mx-auto flex flex-col min-h-screen">
+    <div className="max-w-lg mx-auto flex flex-col min-h-screen" style={{ background: 'var(--bg)' }}>
       <AnimatePresence>
         {showSearch && (
           <SongSearch onSelect={handleSelectSong} onClose={() => setShowSearch(false)} />
@@ -85,10 +93,14 @@ export default function DropSubmission() {
 
       {/* Header */}
       <div className="flex items-center gap-3 px-6 pt-6 pb-4">
-        <button onClick={() => navigate(`/group/${groupId}`)} className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all">
+        <button onClick={() => navigate(`/group/${groupId}`)}
+          className="w-8 h-8 rounded-full flex items-center justify-center transition-all"
+          style={{ background: 'var(--bg-subtle)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
           <ArrowLeft size={18} />
         </button>
-        <h1 className="text-lg font-bold text-white">Drop Your Song</h1>
+        <h1 className="text-lg font-bold" style={{ color: 'var(--charcoal)', fontFamily: "'Instrument Serif', serif" }}>
+          Drop Your Song
+        </h1>
       </div>
 
       <div className="flex-1 px-6 pb-6 space-y-5">
@@ -103,8 +115,9 @@ export default function DropSubmission() {
                 {selectedSong.album_art ? (
                   <img src={selectedSong.album_art} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-white/[0.04] flex items-center justify-center">
-                    <Music size={48} className="text-white/20" />
+                  <div className="w-full h-full flex items-center justify-center"
+                    style={{ background: 'var(--bg-subtle)' }}>
+                    <Music size={48} style={{ color: 'var(--text-muted)' }} />
                   </div>
                 )}
               </div>
@@ -113,31 +126,42 @@ export default function DropSubmission() {
                 <p className="text-lg font-bold text-white">{selectedSong.title}</p>
                 <p className="text-base text-white/70">{selectedSong.artist} · {selectedSong.album}</p>
               </div>
-              <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm rounded-full px-2.5 py-1 text-base text-white/70 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute top-3 right-3 backdrop-blur-sm rounded-full px-2.5 py-1 text-base text-white/70 opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ background: 'rgba(0,0,0,0.5)' }}>
                 Change song
               </div>
             </div>
           ) : (
-            <div className="bg-white/[0.03] border border-dashed border-white/[0.1] rounded-2xl p-12 flex flex-col items-center gap-3 hover:bg-white/[0.05] hover:border-amber-500/30 transition-all">
-              <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center">
-                <SearchIcon size={20} className="text-amber-500" />
+            <div className="rounded-2xl p-12 flex flex-col items-center gap-3 transition-all"
+              style={{
+                background: 'var(--bg-card)',
+                border: '1px dashed var(--border)',
+              }}>
+              <div className="w-12 h-12 rounded-full flex items-center justify-center"
+                style={{ background: 'rgba(191, 107, 74, 0.1)' }}>
+                <SearchIcon size={20} style={{ color: 'var(--terracotta)' }} />
               </div>
-              <p className="text-base text-white/60">Search Spotify for a song</p>
+              <p className="text-base" style={{ color: 'var(--text-secondary)' }}>Search Spotify for a song</p>
             </div>
           )}
         </button>
 
         {/* Caption */}
         <div className="space-y-1.5">
-          <label className="text-base text-white/60 font-medium">Caption</label>
+          <label className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>Caption</label>
           <textarea
             value={caption}
             onChange={(e) => setCaption(e.target.value.slice(0, 140))}
             placeholder="What does this song mean to you today?"
             rows={2}
-            className="w-full bg-white/[0.04] text-white placeholder-white/30 rounded-xl px-4 py-3 outline-none focus:ring-1 focus:ring-amber-500/30 focus:bg-white/[0.06] text-base resize-none transition-all border border-white/[0.06]"
+            className="w-full rounded-xl px-4 py-3 outline-none text-base resize-none transition-all"
+            style={{
+              background: 'var(--bg-subtle)',
+              color: 'var(--charcoal)',
+              border: '1px solid var(--border)',
+            }}
           />
-          <p className="text-right text-base text-white/40">{caption.length}/140</p>
+          <p className="text-right text-base" style={{ color: 'var(--text-muted)' }}>{caption.length}/140</p>
         </div>
 
         {/* Submit */}
@@ -146,11 +170,16 @@ export default function DropSubmission() {
           whileTap={{ scale: 0.98 }}
           onClick={handleSubmit}
           disabled={!selectedSong || submitting}
-          className="w-full bg-amber-500 hover:bg-amber-400 disabled:bg-white/[0.06] disabled:text-white/30 text-black font-bold rounded-xl py-3.5 text-base transition-all mt-2"
+          className="w-full font-bold rounded-xl py-3.5 text-base transition-all mt-2 disabled:opacity-50"
+          style={{
+            background: selectedSong && !submitting ? 'var(--terracotta)' : 'var(--bg-subtle)',
+            color: selectedSong && !submitting ? '#fff' : 'var(--text-muted)',
+          }}
         >
           {submitting ? (
             <span className="flex items-center justify-center gap-2">
-              <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 rounded-full animate-spin"
+                style={{ borderColor: 'var(--border)', borderTopColor: 'var(--terracotta)' }} />
               Dropping...
             </span>
           ) : 'Drop It'}

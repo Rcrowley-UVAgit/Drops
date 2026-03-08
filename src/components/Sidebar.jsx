@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { User, Zap } from 'lucide-react'
+import { User } from 'lucide-react'
 import { useGroups } from '../context/GroupsContext'
-import { getGroupMembers } from '../lib/demoData'
 
 export default function Sidebar() {
   const location = useLocation()
@@ -24,7 +23,7 @@ export default function Sidebar() {
           </p>
           {groups.map((group) => {
             const isActive = currentGroupId === group.id
-            const members = getGroupMembers(group)
+            const members = group.members || []
             return (
               <button
                 key={group.id}
@@ -36,16 +35,7 @@ export default function Sidebar() {
                 }}
               >
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-sm font-medium truncate">{group.name}</p>
-                    {group.streak_count > 0 && (
-                      <span className="flex items-center gap-0.5 text-sm font-semibold shrink-0"
-                        style={{ color: 'var(--terracotta)' }}>
-                        <Zap size={14} fill="currentColor" style={{ color: 'var(--terracotta)' }} />
-                        {group.streak_count}d
-                      </span>
-                    )}
-                  </div>
+                  <p className="text-sm font-medium truncate">{group.name}</p>
                   <p className="text-sm truncate" style={{ color: 'var(--text-muted)' }}>
                     {members.length} members
                   </p>

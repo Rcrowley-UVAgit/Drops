@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Search, Music, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { formatDuration } from '../lib/demoData'
+import { formatDuration } from '../lib/utils'
 import { searchSpotify } from '../lib/spotify'
 
 export default function SongSearch({ onSelect, onClose }) {

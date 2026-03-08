@@ -2,41 +2,40 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Send } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { getUser, formatTimeAgo } from '../lib/demoData'
+import { useGroups } from '../context/GroupsContext'
+import { formatTimeAgo } from '../lib/utils'
 
-export default function Comments({ comments = [], dropId }) {
+export default function Comments({ comments = [], dropId, members: membersProp }) {
   const { user } = useAuth()
-  const [localComments, setLocalComments] = useState(comments)
+  const { members: contextMembers, addComment, group } = useGroups()
+  const members = membersProp || contextMembers || []
   const [newComment, setNewComment] = useState('')
 
-  const handleSubmit = (e) => {
+  const getMember = (userId) => members.find(m => m.id === userId) || { display_name: 'Unknown', color: '#6b7280' }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!newComment.trim()) return
-    setLocalComments(prev => [...prev, {
-      id: `temp-${Date.now()}`,
-      user_id: user.id,
-      body: newComment.trim(),
-      created_at: new Date().toISOString(),
-    }])
+    await addComment(group?.id, dropId, newComment.trim())
     setNewComment('')
   }
 
   return (
     <div className="space-y-2 pt-1">
-      {localComments.map((comment, i) => {
-        const commenter = getUser(comment.user_id)
+      {comments.map((comment, i) => {
+        const commenter = getMember(comment.user_id)
         return (
           <motion.div
             key={comment.id}
-            initial={i >= comments.length ? { opacity: 0, y: 8 } : false}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             className="min-w-0"
           >
             <div className="flex items-baseline gap-1.5">
               <span className="text-base font-medium" style={{ color: commenter.color }}>{commenter.display_name}</span>
-              <span className="text-base text-white/25">{formatTimeAgo(comment.created_at)}</span>
+              <span className="text-base" style={{ color: 'var(--text-muted)' }}>{formatTimeAgo(comment.created_at)}</span>
             </div>
-            <p className="text-base text-white/60 break-words">{comment.body}</p>
+            <p className="text-base break-words" style={{ color: 'var(--text-secondary)' }}>{comment.body}</p>
           </motion.div>
         )
       })}
@@ -47,12 +46,18 @@ export default function Comments({ comments = [], dropId }) {
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Add a comment..."
-          className="flex-1 bg-white/[0.04] text-base text-white placeholder-white/30 rounded-full px-3 py-1.5 outline-none focus:ring-1 focus:ring-amber-500/30"
+          className="flex-1 text-base rounded-full px-3 py-1.5 outline-none transition-all"
+          style={{
+            background: 'var(--bg-subtle)',
+            color: 'var(--charcoal)',
+            border: '1px solid var(--border)',
+          }}
         />
         <button
           type="submit"
           disabled={!newComment.trim()}
-          className="text-amber-500 disabled:text-white/20 transition-colors"
+          className="transition-colors"
+          style={{ color: newComment.trim() ? 'var(--terracotta)' : 'var(--text-muted)' }}
         >
           <Send size={14} />
         </button>

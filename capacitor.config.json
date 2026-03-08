@@ -1,0 +1,23 @@
+{
+  "appId": "com.revinyl.drops",
+  "appName": "ReVinyl",
+  "webDir": "dist",
+  "plugins": {
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#FFFCF6"
+    },
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "backgroundColor": "#FFFCF6",
+      "showSpinner": false
+    },
+    "Keyboard": {
+      "resize": "body",
+      "resizeOnFullScreen": true
+    },
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  }
+}

@@ -1,27 +1,24 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { LogOut, Music, Heart, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { demoPastDrops, demoGroups, CURRENT_USER, getUser, formatTimeAgo } from '../lib/demoData'
+import { useGroups } from '../context/GroupsContext'
+import { fetchMyDrops } from '../lib/api'
 
 export default function Profile() {
   const { user, signOut, updateDisplayName } = useAuth()
+  const { groups } = useGroups()
   const [editing, setEditing] = useState(false)
   const [nameInput, setNameInput] = useState(user?.display_name || '')
+  const [myDrops, setMyDrops] = useState([])
 
-  const myDrops = useMemo(() => {
-    const drops = []
-    for (const [groupId, groupDrops] of Object.entries(demoPastDrops)) {
-      groupDrops.filter(d => d.user_id === user?.id).forEach(d => {
-        const group = demoGroups.find(g => g.id === groupId)
-        drops.push({ ...d, groupName: group?.name })
-      })
+  useEffect(() => {
+    if (user) {
+      fetchMyDrops().then(({ data }) => setMyDrops(data || []))
     }
-    return drops.sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))
   }, [user])
 
   const totalReactions = myDrops.reduce((sum, d) => sum + (d.reactions?.length || 0), 0)
-  const groupCount = demoGroups.filter(g => g.members.includes(user?.id)).length
 
   const handleSaveName = () => {
     if (nameInput.trim()) updateDisplayName(nameInput.trim())
@@ -85,7 +82,7 @@ export default function Profile() {
         {[
           { icon: Music, label: 'Drops', value: myDrops.length },
           { icon: Heart, label: 'Reactions', value: totalReactions },
-          { icon: Users, label: 'Groups', value: groupCount },
+          { icon: Users, label: 'Groups', value: groups.length },
         ].map(({ icon: Icon, label, value }) => (
           <div key={label} className="rounded-xl p-3 text-center"
             style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
@@ -119,7 +116,7 @@ export default function Profile() {
             )}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate" style={{ color: 'var(--charcoal)' }}>{drop.song.title}</p>
-              <p className="text-sm truncate" style={{ color: 'var(--text-secondary)' }}>{drop.song.artist} · {drop.groupName}</p>
+              <p className="text-sm truncate" style={{ color: 'var(--text-secondary)' }}>{drop.song.artist}</p>
             </div>
           </motion.div>
         )) : (

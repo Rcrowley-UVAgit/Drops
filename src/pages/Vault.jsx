@@ -1,34 +1,30 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Music, ExternalLink, X } from 'lucide-react'
-import { demoPastDrops, demoGroups, getUser, formatTimeAgo } from '../lib/demoData'
+import { useGroups } from '../context/GroupsContext'
+import { formatTimeAgo } from '../lib/utils'
+import { openLink } from '../lib/openLink'
 
 export default function Vault() {
+  const { todayDrop, pastDrops, members, group } = useGroups()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedDrop, setSelectedDrop] = useState(null)
-  const [activeGroup, setActiveGroup] = useState('all')
 
   const allDrops = useMemo(() => {
     const drops = []
-    for (const [groupId, groupDrops] of Object.entries(demoPastDrops)) {
-      const group = demoGroups.find(g => g.id === groupId)
-      groupDrops.forEach(d => drops.push({ ...d, groupId, groupName: group?.name }))
-    }
-    const famGroup = demoGroups.find(g => g.id === 'fam')
-    if (famGroup?.today_drop) {
-      drops.push({ ...famGroup.today_drop, groupId: 'fam', groupName: 'Fam' })
-    }
+    if (todayDrop) drops.push({ ...todayDrop, groupName: group?.name })
+    pastDrops.forEach(d => drops.push({ ...d, groupName: group?.name }))
     return drops.sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))
-  }, [])
+  }, [todayDrop, pastDrops, group])
+
+  const getMember = (userId) => members.find(m => m.id === userId) || { display_name: 'Unknown', color: '#6b7280' }
 
   const filteredDrops = allDrops.filter(d => {
     const q = searchQuery.toLowerCase()
-    const matchesSearch = !q ||
-      d.song.title.toLowerCase().includes(q) ||
+    if (!q) return true
+    return d.song.title.toLowerCase().includes(q) ||
       d.song.artist.toLowerCase().includes(q) ||
-      getUser(d.user_id).display_name.toLowerCase().includes(q)
-    const matchesGroup = activeGroup === 'all' || d.groupId === activeGroup
-    return matchesSearch && matchesGroup
+      getMember(d.user_id).display_name.toLowerCase().includes(q)
   })
 
   return (
@@ -58,14 +54,6 @@ export default function Vault() {
             border: '1px solid var(--border)',
           }}
         />
-      </div>
-
-      {/* Group filter pills */}
-      <div className="flex gap-2">
-        <FilterPill label="All" active={activeGroup === 'all'} onClick={() => setActiveGroup('all')} />
-        {demoGroups.map(g => (
-          <FilterPill key={g.id} label={g.name} active={activeGroup === g.id} onClick={() => setActiveGroup(g.id)} />
-        ))}
       </div>
 
       {/* Album art grid */}
@@ -127,40 +115,30 @@ export default function Vault() {
               </button>
             </div>
             <div className="flex items-center gap-2 text-sm flex-wrap" style={{ color: 'var(--text-secondary)' }}>
-              <DropperBadge userId={selectedDrop.user_id} />
-              <span>·</span>
+              <DropperBadge member={getMember(selectedDrop.user_id)} />
+              <span>&middot;</span>
               <span>{formatTimeAgo(selectedDrop.submitted_at)}</span>
-              {selectedDrop.groupName && (
-                <>
-                  <span>·</span>
-                  <span>{selectedDrop.groupName}</span>
-                </>
-              )}
             </div>
             {selectedDrop.caption && (
               <p className="text-sm italic" style={{ color: 'var(--text-secondary)' }}>"{selectedDrop.caption}"</p>
             )}
             <div className="flex items-center gap-2 flex-wrap">
               {selectedDrop.song.spotify_url && (
-                <a
-                  href={selectedDrop.song.spotify_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => openLink(selectedDrop.song.spotify_url)}
                   className="inline-flex items-center gap-2 text-sm bg-[#1DB954] text-white px-5 py-2.5 rounded-full font-bold hover:bg-[#17a34a] transition-colors"
                 >
                   <ExternalLink size={14} />
                   Spotify
-                </a>
+                </button>
               )}
-              <a
-                href={`https://music.apple.com/us/search?term=${encodeURIComponent(selectedDrop.song.title + ' ' + selectedDrop.song.artist)}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => openLink(`https://music.apple.com/us/search?term=${encodeURIComponent(selectedDrop.song.title + ' ' + selectedDrop.song.artist)}`)}
                 className="inline-flex items-center gap-2 text-sm bg-[#fc3c44] text-white px-5 py-2.5 rounded-full font-bold hover:bg-[#e0353d] transition-colors"
               >
                 <ExternalLink size={14} />
                 Apple Music
-              </a>
+              </button>
             </div>
           </motion.div>
         )}
@@ -168,39 +146,23 @@ export default function Vault() {
 
       {filteredDrops.length === 0 && (
         <div className="text-center py-16 text-sm" style={{ color: 'var(--text-muted)' }}>
-          No drops match your search
+          {allDrops.length === 0 ? 'No drops yet' : 'No drops match your search'}
         </div>
       )}
     </div>
   )
 }
 
-function FilterPill({ label, active, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className="text-sm px-3 py-1.5 rounded-full font-medium transition-all"
-      style={{
-        background: active ? 'var(--charcoal)' : 'var(--bg-subtle)',
-        color: active ? 'var(--bg)' : 'var(--text-secondary)',
-      }}
-    >
-      {label}
-    </button>
-  )
-}
-
-function DropperBadge({ userId }) {
-  const user = getUser(userId)
+function DropperBadge({ member }) {
   return (
     <span className="flex items-center gap-1">
       <span
         className="w-3.5 h-3.5 rounded-full inline-flex items-center justify-center text-xs font-bold"
-        style={{ backgroundColor: user.color, color: '#fff' }}
+        style={{ backgroundColor: member.color, color: '#fff' }}
       >
-        {user.display_name[0]}
+        {member.display_name[0]}
       </span>
-      {user.display_name}
+      {member.display_name}
     </span>
   )
 }

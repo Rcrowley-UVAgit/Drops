@@ -2,26 +2,21 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { isDemoMode } from '../lib/supabase'
 
 export default function Landing() {
-  const { signInWithMagicLink } = useAuth()
-  const [email, setEmail] = useState('')
-  const [sent, setSent] = useState(false)
+  const { signInWithCode } = useAuth()
+  const [name, setName] = useState('')
+  const [code, setCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (isDemoMode) {
-      signInWithMagicLink(email)
-      return
-    }
+    if (!name.trim() || !code.trim()) return
     setLoading(true)
     setError('')
-    const { error: authError } = await signInWithMagicLink(email)
+    const { error: authError } = await signInWithCode(code, name)
     if (authError) setError(authError.message)
-    else setSent(true)
     setLoading(false)
   }
 
@@ -72,51 +67,44 @@ export default function Landing() {
         </div>
 
         {/* Auth form */}
-        {!sent ? (
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required={!isDemoMode}
-              className="w-full rounded-xl px-4 py-3.5 outline-none text-base transition-all"
-              style={{
-                background: 'var(--bg-subtle)',
-                color: 'var(--charcoal)',
-                border: '1px solid var(--border)',
-              }}
-            />
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full font-bold rounded-xl px-4 py-3.5 text-base transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-              style={{ background: 'var(--terracotta)', color: '#fff' }}
-            >
-              {isDemoMode ? 'Enter Demo' : loading ? 'Sending...' : 'Get Magic Link'}
-              <ArrowRight size={16} />
-            </button>
-          </form>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="rounded-xl p-6 space-y-2"
-            style={{ background: 'var(--bg-subtle)', border: '1px solid var(--border)' }}
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your name"
+            required
+            className="w-full rounded-xl px-4 py-3.5 outline-none text-base transition-all"
+            style={{
+              background: 'var(--bg-subtle)',
+              color: 'var(--charcoal)',
+              border: '1px solid var(--border)',
+            }}
+          />
+          <input
+            type="text"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder="Invite code"
+            required
+            className="w-full rounded-xl px-4 py-3.5 outline-none text-base transition-all"
+            style={{
+              background: 'var(--bg-subtle)',
+              color: 'var(--charcoal)',
+              border: '1px solid var(--border)',
+            }}
+          />
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full font-bold rounded-xl px-4 py-3.5 text-base transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            style={{ background: 'var(--terracotta)', color: '#fff' }}
           >
-            <p className="font-semibold" style={{ color: 'var(--terracotta)' }}>Check your email</p>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Sign-in link sent to <span style={{ color: 'var(--charcoal)' }}>{email}</span>
-            </p>
-          </motion.div>
-        )}
-
-        {isDemoMode && (
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            Demo mode active
-          </p>
-        )}
+            {loading ? 'Joining...' : 'Join'}
+            <ArrowRight size={16} />
+          </button>
+        </form>
       </motion.div>
     </div>
   )

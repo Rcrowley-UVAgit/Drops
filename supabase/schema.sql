@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   display_name TEXT NOT NULL DEFAULT '',
   avatar_url TEXT,
+  color TEXT DEFAULT '#BF6B4A',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -181,3 +182,75 @@ CREATE INDEX IF NOT EXISTS idx_comments_drop ON public.comments(drop_id);
 CREATE INDEX IF NOT EXISTS idx_group_members_group ON public.group_members(group_id);
 CREATE INDEX IF NOT EXISTS idx_group_members_user ON public.group_members(user_id);
 CREATE INDEX IF NOT EXISTS idx_songs_spotify ON public.songs(spotify_track_id);
+
+-- ============================================
+-- Additional RLS for anonymous auth
+-- ============================================
+-- Allow anonymous users to insert their own profile
+CREATE POLICY "Users can insert own profile" ON public.profiles FOR INSERT
+  WITH CHECK (auth.uid() = id);
+
+-- Allow groups to be read by invite code (for join flow)
+CREATE POLICY "Anyone can read groups by invite code" ON public.groups FOR SELECT
+  USING (auth.uid() IS NOT NULL);
+
+-- ============================================
+-- Device Tokens (for push notifications)
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.device_tokens (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  token TEXT NOT NULL,
+  platform TEXT NOT NULL DEFAULT 'ios' CHECK (platform IN ('ios', 'android', 'web')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(user_id, token)
+);
+
+ALTER TABLE public.device_tokens ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can read own tokens" ON public.device_tokens FOR SELECT
+  USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own tokens" ON public.device_tokens FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can delete own tokens" ON public.device_tokens FOR DELETE
+  USING (auth.uid() = user_id);
+
+CREATE INDEX IF NOT EXISTS idx_device_tokens_user ON public.device_tokens(user_id);
+
+-- ============================================
+-- Notify on new drop (triggers edge function)
+-- ============================================
+CREATE OR REPLACE FUNCTION public.notify_new_drop()
+RETURNS trigger AS $$
+BEGIN
+  PERFORM net.http_post(
+    url := current_setting('app.settings.supabase_url') || '/functions/v1/send-drop-notification',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key')
+    ),
+    body := jsonb_build_object(
+      'drop_id', NEW.id,
+      'group_id', NEW.group_id,
+      'user_id', NEW.user_id,
+      'song_id', NEW.song_id
+    )
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- NOTE: This trigger requires the pg_net extension (enabled by default on Supabase).
+-- If you get an error about net.http_post, enable it: CREATE EXTENSION IF NOT EXISTS pg_net;
+-- Alternatively, call the edge function from the client after submitDrop.
+-- DROP TRIGGER IF EXISTS on_new_drop ON public.drops;
+-- CREATE TRIGGER on_new_drop
+--   AFTER INSERT ON public.drops
+--   FOR EACH ROW EXECUTE FUNCTION public.notify_new_drop();
+
+-- ============================================
+-- Seed Data: UW Lads group
+-- ============================================
+-- Run after deploying schema:
+-- INSERT INTO public.groups (name, invite_code) VALUES ('UW Lads', 'UWLADS2026');

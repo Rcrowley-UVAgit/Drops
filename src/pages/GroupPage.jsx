@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Clock, Music, Search as SearchIcon, ExternalLink, Link2, Check, ChevronDown, Users } from 'lucide-react'
+import { Clock, Music, Search as SearchIcon, ExternalLink, ChevronDown, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useGroups } from '../context/GroupsContext'
-import { getUser, getGroupMembers, getShotclock, formatTimeAgo, CURRENT_USER } from '../lib/demoData'
+import { getShotclock, formatTimeAgo } from '../lib/utils'
+import { openLink } from '../lib/openLink'
 import DropCard from '../components/DropCard'
 import Turntable from '../components/Turntable'
 import SongSearch from '../components/SongSearch'
@@ -14,22 +15,21 @@ export default function GroupPage() {
   const { user } = useAuth()
   const { groups, pastDrops: contextPastDrops } = useGroups()
   const [shotclock, setShotclock] = useState(getShotclock())
-  const [copied, setCopied] = useState(false)
   const [membersOpen, setMembersOpen] = useState(false)
-  const [phase, setPhase] = useState('turntable') // turntable | your-turn | waiting
+  const [phase, setPhase] = useState('turntable') // turntable | your-turn | waiting | dropped
   const [winner, setWinner] = useState(null)
   const [showSongSearch, setShowSongSearch] = useState(false)
   const [selectedSong, setSelectedSong] = useState(null)
   const [caption, setCaption] = useState('')
 
   const group = groups.find(g => g.id === groupId) || groups[0]
-  const members = getGroupMembers(group)
-  const dropper = getUser(group.today_dropper)
-  const pastDrops = contextPastDrops[group.id] || []
-  const spunAlready = group.drop_status === 'dropped' || group.drop_status === 'your_turn' || group.drop_status === 'waiting'
+  const members = group?.members || []
+  const todayDropper = members.find(m => m.id === group?.today_dropper)
+  const pastDrops = contextPastDrops || []
+  const spunAlready = group?.drop_status === 'dropped' || group?.drop_status === 'your_turn' || group?.drop_status === 'waiting'
 
   const allDrops = []
-  if (group.today_drop) allDrops.push(group.today_drop)
+  if (group?.today_drop) allDrops.push(group.today_drop)
   allDrops.push(...pastDrops)
 
   useEffect(() => {
@@ -45,12 +45,12 @@ export default function GroupPage() {
         setWinner(user)
       } else if (group.drop_status === 'waiting') {
         setPhase('waiting')
-        setWinner(dropper)
+        setWinner(todayDropper)
       } else if (group.drop_status === 'dropped') {
         setPhase('dropped')
       }
     }
-  }, [spunAlready, group.drop_status])
+  }, [spunAlready, group?.drop_status])
 
   const handleSpinComplete = useCallback((chosenWinner) => {
     setWinner(chosenWinner)
@@ -61,20 +61,21 @@ export default function GroupPage() {
     }
   }, [user])
 
-  const handleCopyInvite = () => {
-    navigator.clipboard?.writeText(`https://musicdrops.netlify.app/join/${group.id}`)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
   const handleSongSelect = (song) => {
     setSelectedSong(song)
     setShowSongSearch(false)
   }
 
   const handleDrop = () => {
-    // In real app, submit to backend
     setPhase('dropped')
+  }
+
+  if (!group) {
+    return (
+      <div className="flex items-center justify-center h-full" style={{ color: 'var(--text-muted)' }}>
+        <p className="text-sm">Loading group...</p>
+      </div>
+    )
   }
 
   return (
@@ -82,22 +83,8 @@ export default function GroupPage() {
       <div className="max-w-2xl mx-auto">
         {/* Group Header */}
         <div className="px-5 pt-6 pb-2">
-          <div className="flex items-center justify-between">
-            <h1 style={{ fontFamily: "'Instrument Serif', serif", color: 'var(--charcoal)' }}
-              className="text-2xl tracking-tight">{group.name}</h1>
-            <button
-              onClick={handleCopyInvite}
-              className="flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full transition-all"
-              style={{
-                background: 'var(--bg-subtle)',
-                color: 'var(--text-secondary)',
-                border: '1px solid var(--border)',
-              }}
-            >
-              {copied ? <Check size={16} /> : <Link2 size={16} />}
-              {copied ? 'Copied!' : 'Invite'}
-            </button>
-          </div>
+          <h1 style={{ fontFamily: "'Instrument Serif', serif", color: 'var(--charcoal)' }}
+            className="text-2xl tracking-tight">{group.name}</h1>
         </div>
 
         {/* Members chips */}
@@ -123,7 +110,7 @@ export default function GroupPage() {
               transition={{ duration: 0.2 }}
               className="mt-2 flex items-center gap-2 flex-wrap"
             >
-              {members.map((member, i) => {
+              {members.map((member) => {
                 const isWinner = winner && member.id === winner.id
                 return (
                   <div
@@ -171,7 +158,7 @@ export default function GroupPage() {
           )}
 
           {phase === 'dropped' && group.today_drop && (
-            <DroppedState group={group} />
+            <DroppedState group={group} members={members} />
           )}
 
           {/* Previous drops */}
@@ -188,7 +175,7 @@ export default function GroupPage() {
               </div>
               <div className="space-y-3">
                 {allDrops.map((drop, i) => (
-                  <DropCard key={drop.id} drop={drop} index={i} />
+                  <DropCard key={drop.id} drop={drop} index={i} members={members} />
                 ))}
               </div>
             </div>
@@ -343,10 +330,10 @@ function TimeUnit({ value, label }) {
 }
 
 /* Dropped state */
-function DroppedState({ group }) {
+function DroppedState({ group, members }) {
   const drop = group.today_drop
   if (!drop) return null
-  const dropper = getUser(drop.user_id)
+  const dropper = members.find(m => m.id === drop.user_id) || { display_name: 'Unknown', color: '#6b7280' }
   const song = drop.song
 
   return (
@@ -391,19 +378,19 @@ function DroppedState({ group }) {
           )}
           <div className="flex items-center gap-2 flex-wrap">
             {song.spotify_url && (
-              <a href={song.spotify_url} target="_blank" rel="noopener noreferrer"
+              <button onClick={() => openLink(song.spotify_url)}
                 className="inline-flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium transition-colors"
                 style={{ background: 'var(--bg-subtle)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>
                 <ExternalLink size={16} /> Spotify
-              </a>
+              </button>
             )}
-            <a href={`https://music.apple.com/us/search?term=${encodeURIComponent(song.title + ' ' + song.artist)}`} target="_blank" rel="noopener noreferrer"
+            <button onClick={() => openLink(`https://music.apple.com/us/search?term=${encodeURIComponent(song.title + ' ' + song.artist)}`)}
               className="inline-flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium transition-colors"
               style={{ background: 'var(--bg-subtle)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>
               <ExternalLink size={16} /> Apple Music
-            </a>
+            </button>
           </div>
-          <DropCard drop={drop} reactionsOnly />
+          <DropCard drop={drop} reactionsOnly members={members} />
         </div>
       </div>
     </motion.div>

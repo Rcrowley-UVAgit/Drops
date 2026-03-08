@@ -3,7 +3,7 @@
 // 1. Direct client credentials (VITE_SPOTIFY_CLIENT_ID + VITE_SPOTIFY_CLIENT_SECRET in .env)
 // 2. Via Supabase Edge Function (Spotify creds stored as Supabase secrets)
 
-import { supabase, isDemoMode } from './supabase'
+import { supabase } from './supabase'
 
 const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID || ''
 const CLIENT_SECRET = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET || ''
@@ -74,10 +74,5 @@ export async function searchSpotify(query, limit = 10) {
   }
 
   // Otherwise try Supabase edge function
-  if (!isDemoMode) {
-        return searchViaEdgeFunction(query)
-  }
-
-  // No search available
-  throw new Error('No Spotify search configured')
+  return searchViaEdgeFunction(query)
 }

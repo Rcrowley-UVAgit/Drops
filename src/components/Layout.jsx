@@ -1,24 +1,28 @@
-import { useState, useRef, useCallback } from 'react'
+import { useRef, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Archive, User, Music } from 'lucide-react'
+import { useGroups } from '../context/GroupsContext'
 import Sidebar from './Sidebar'
-
-const MOBILE_NAV = [
-  { path: '/group/uw-lads', icon: Music, label: 'Groups', matchPrefix: '/group' },
-  { path: '/vault', icon: Archive, label: 'Vault' },
-  { path: '/profile', icon: User, label: 'Profile' },
-]
 
 export default function Layout({ children }) {
   const location = useLocation()
   const navigate = useNavigate()
+  const { groups } = useGroups()
+
+  const defaultGroupPath = groups[0] ? `/group/${groups[0].id}` : '/group/uw-lads'
+
+  const MOBILE_NAV = [
+    { path: defaultGroupPath, icon: Music, label: 'Groups', matchPrefix: '/group' },
+    { path: '/vault', icon: Archive, label: 'Vault' },
+    { path: '/profile', icon: User, label: 'Profile' },
+  ]
 
   return (
     <div className="flex flex-col h-full" style={{ background: 'var(--bg)' }}>
       {/* Top Banner */}
       <header className="hidden md:flex items-center px-6 py-4 shrink-0"
         style={{ background: 'var(--bg)', borderBottom: '1px solid var(--border)' }}>
-        <button onClick={() => navigate('/group/uw-lads')} className="flex items-center gap-2.5 group">
+        <button onClick={() => navigate(defaultGroupPath)} className="flex items-center gap-2.5 group">
           <span style={{
             fontSize: '26px',
             fontFamily: "'Instrument Serif', serif",
