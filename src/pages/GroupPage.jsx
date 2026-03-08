@@ -13,7 +13,7 @@ import SongSearch from '../components/SongSearch'
 export default function GroupPage() {
   const { groupId } = useParams()
   const { user } = useAuth()
-  const { groups, pastDrops: contextPastDrops } = useGroups()
+  const { groups, pastDrops: contextPastDrops, loading: groupsLoading } = useGroups()
   const [shotclock, setShotclock] = useState(getShotclock())
   const [membersOpen, setMembersOpen] = useState(false)
   const [phase, setPhase] = useState('turntable') // turntable | your-turn | waiting | dropped
@@ -22,7 +22,7 @@ export default function GroupPage() {
   const [selectedSong, setSelectedSong] = useState(null)
   const [caption, setCaption] = useState('')
 
-  const group = groups.find(g => g.id === groupId) || groups[0]
+  const group = groups.find(g => g.id === groupId) || groups[0] || null
   const members = group?.members || []
   const todayDropper = members.find(m => m.id === group?.today_dropper)
   const pastDrops = contextPastDrops || []
@@ -70,10 +70,14 @@ export default function GroupPage() {
     setPhase('dropped')
   }
 
-  if (!group) {
+  if (!group || groupsLoading) {
     return (
       <div className="flex items-center justify-center h-full" style={{ color: 'var(--text-muted)' }}>
-        <p className="text-sm">Loading group...</p>
+        <div className="text-center space-y-3">
+          <div className="w-8 h-8 border-2 rounded-full animate-spin mx-auto"
+            style={{ borderColor: 'var(--border)', borderTopColor: 'var(--terracotta)' }} />
+          <p className="text-sm">Loading group...</p>
+        </div>
       </div>
     )
   }
