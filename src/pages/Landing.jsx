@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowRight, Disc3 } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { isDemoMode } from '../lib/supabase'
 
@@ -26,9 +26,11 @@ export default function Landing() {
   }
 
   return (
-    <div className="min-h-screen bg-[#060606] flex flex-col items-center justify-center px-6 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden"
+      style={{ background: 'var(--bg)' }}>
       {/* Background glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl"
+        style={{ background: 'rgba(191, 107, 74, 0.06)' }} />
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -38,26 +40,30 @@ export default function Landing() {
       >
         {/* Logo */}
         <div className="space-y-4">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-            className="inline-block"
-          >
-            <Disc3 size={56} className="text-amber-500" strokeWidth={1.5} />
-          </motion.div>
-          <h1 className="text-5xl font-bold tracking-tighter text-white">
-            DROPS
+          <h1 style={{
+            fontFamily: "'Instrument Serif', serif",
+            fontStyle: 'italic',
+            color: 'var(--charcoal)',
+            fontSize: '56px',
+            letterSpacing: '-0.02em',
+          }}>
+            Revinyl
           </h1>
-          <p className="text-white/50 text-base tracking-wide">
+          <p className="text-base tracking-wide" style={{ color: 'var(--text-secondary)' }}>
             One song. One friend. Every day.
           </p>
         </div>
 
         {/* Steps */}
-        <div className="flex justify-center gap-8 text-base text-white/50">
+        <div className="flex justify-center gap-8 text-sm" style={{ color: 'var(--text-secondary)' }}>
           {['Spin', 'Share', 'React'].map((step, i) => (
             <div key={step} className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center text-base font-bold border border-amber-500/20">
+              <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold"
+                style={{
+                  background: 'rgba(191, 107, 74, 0.1)',
+                  color: 'var(--terracotta)',
+                  border: '1px solid rgba(191, 107, 74, 0.2)',
+                }}>
                 {i + 1}
               </span>
               <span>{step}</span>
@@ -74,13 +80,19 @@ export default function Landing() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required={!isDemoMode}
-              className="w-full bg-white/[0.04] text-white placeholder-white/30 rounded-xl px-4 py-3.5 outline-none focus:ring-2 focus:ring-amber-500/30 focus:bg-white/[0.06] text-base transition-all border border-white/[0.06]"
+              className="w-full rounded-xl px-4 py-3.5 outline-none text-base transition-all"
+              style={{
+                background: 'var(--bg-subtle)',
+                color: 'var(--charcoal)',
+                border: '1px solid var(--border)',
+              }}
             />
-            {error && <p className="text-red-400 text-base">{error}</p>}
+            {error && <p className="text-red-500 text-sm">{error}</p>}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-xl px-4 py-3.5 text-base transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full font-bold rounded-xl px-4 py-3.5 text-base transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              style={{ background: 'var(--terracotta)', color: '#fff' }}
             >
               {isDemoMode ? 'Enter Demo' : loading ? 'Sending...' : 'Get Magic Link'}
               <ArrowRight size={16} />
@@ -90,17 +102,18 @@ export default function Landing() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white/[0.04] rounded-xl p-6 space-y-2 border border-white/[0.06]"
+            className="rounded-xl p-6 space-y-2"
+            style={{ background: 'var(--bg-subtle)', border: '1px solid var(--border)' }}
           >
-            <p className="text-amber-500 font-semibold">Check your email</p>
-            <p className="text-white/60 text-base">
-              Sign-in link sent to <span className="text-white">{email}</span>
+            <p className="font-semibold" style={{ color: 'var(--terracotta)' }}>Check your email</p>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              Sign-in link sent to <span style={{ color: 'var(--charcoal)' }}>{email}</span>
             </p>
           </motion.div>
         )}
 
         {isDemoMode && (
-          <p className="text-base text-white/30">
+          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
             Demo mode active
           </p>
         )}

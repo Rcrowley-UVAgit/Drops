@@ -9,7 +9,6 @@ export default function Profile() {
   const [editing, setEditing] = useState(false)
   const [nameInput, setNameInput] = useState(user?.display_name || '')
 
-  // Gather all drops by this user across all groups
   const myDrops = useMemo(() => {
     const drops = []
     for (const [groupId, groupDrops] of Object.entries(demoPastDrops)) {
@@ -30,8 +29,12 @@ export default function Profile() {
   }
 
   return (
-    <div className="max-w-lg mx-auto px-6 py-6 space-y-6">
-      <h1 className="text-2xl font-bold text-white tracking-tight">Profile</h1>
+    <div className="max-w-lg mx-auto px-6 py-6 space-y-6"
+      style={{ background: 'var(--bg)', minHeight: '100vh' }}>
+      <h1 className="text-2xl font-bold tracking-tight"
+        style={{ fontFamily: "'Instrument Serif', serif", color: 'var(--charcoal)' }}>
+        Profile
+      </h1>
 
       {/* Avatar + name */}
       <motion.div
@@ -41,7 +44,7 @@ export default function Profile() {
       >
         <div
           className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold"
-          style={{ backgroundColor: CURRENT_USER.color + '33', color: CURRENT_USER.color }}
+          style={{ backgroundColor: 'rgba(191, 107, 74, 0.15)', color: 'var(--terracotta)' }}
         >
           {user?.display_name?.[0]?.toUpperCase()}
         </div>
@@ -51,20 +54,28 @@ export default function Profile() {
               type="text"
               value={nameInput}
               onChange={(e) => setNameInput(e.target.value)}
-              className="bg-white/[0.06] text-white rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-amber-500/30 text-base text-center border border-white/[0.06]"
+              className="rounded-lg px-3 py-1.5 outline-none text-sm text-center"
+              style={{
+                background: 'var(--bg-subtle)',
+                color: 'var(--charcoal)',
+                border: '1px solid var(--border)',
+              }}
               autoFocus
               onKeyDown={(e) => e.key === 'Enter' && handleSaveName()}
             />
-            <button onClick={handleSaveName} className="text-base bg-amber-500 text-black px-3 py-1.5 rounded-lg font-bold">
+            <button onClick={handleSaveName}
+              className="text-sm px-3 py-1.5 rounded-lg font-bold"
+              style={{ background: 'var(--terracotta)', color: '#fff' }}>
               Save
             </button>
           </div>
         ) : (
           <button onClick={() => setEditing(true)} className="group text-center">
-            <p className="text-xl font-bold text-white group-hover:text-amber-400 transition-colors">
+            <p className="text-xl font-bold transition-colors"
+              style={{ color: 'var(--charcoal)' }}>
               {user?.display_name}
             </p>
-            <p className="text-base text-white/40 mt-0.5">Tap to edit</p>
+            <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>Tap to edit</p>
           </button>
         )}
       </motion.div>
@@ -76,48 +87,51 @@ export default function Profile() {
           { icon: Heart, label: 'Reactions', value: totalReactions },
           { icon: Users, label: 'Groups', value: groupCount },
         ].map(({ icon: Icon, label, value }) => (
-          <div key={label} className="bg-[#0f0f0f] rounded-xl p-3 text-center border border-white/[0.04]">
-            <Icon size={14} className="text-amber-500 mx-auto mb-1.5" />
-            <p className="text-base font-bold text-white">{value}</p>
-            <p className="text-base text-white/50 mt-0.5">{label}</p>
+          <div key={label} className="rounded-xl p-3 text-center"
+            style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+            <Icon size={14} className="mx-auto mb-1.5" style={{ color: 'var(--terracotta)' }} />
+            <p className="text-sm font-bold" style={{ color: 'var(--charcoal)' }}>{value}</p>
+            <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>{label}</p>
           </div>
         ))}
       </div>
 
       {/* My drops */}
       <div className="space-y-2">
-        <h3 className="text-base font-semibold uppercase tracking-wider text-white/50">My Drops</h3>
-        {myDrops.length > 0 ? myDrops.map((drop, i) => {
-          return (
-            <motion.div
-              key={drop.id}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className="flex items-center gap-3 bg-[#0f0f0f] rounded-xl p-3 border border-white/[0.04]"
-            >
-              {drop.song.album_art ? (
-                <img src={drop.song.album_art} alt="" className="w-10 h-10 rounded-lg object-cover" />
-              ) : (
-                <div className="w-10 h-10 rounded-lg bg-white/[0.04] flex items-center justify-center">
-                  <Music size={16} className="text-white/20" />
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="text-base font-medium text-white truncate">{drop.song.title}</p>
-                <p className="text-base text-white/60 truncate">{drop.song.artist} · {drop.groupName}</p>
+        <h3 className="text-sm font-semibold uppercase tracking-wider"
+          style={{ color: 'var(--text-secondary)' }}>My Drops</h3>
+        {myDrops.length > 0 ? myDrops.map((drop, i) => (
+          <motion.div
+            key={drop.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+            className="flex items-center gap-3 rounded-xl p-3"
+            style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
+          >
+            {drop.song.album_art ? (
+              <img src={drop.song.album_art} alt="" className="w-10 h-10 rounded-lg object-cover" />
+            ) : (
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ background: 'var(--bg-subtle)' }}>
+                <Music size={16} style={{ color: 'var(--text-muted)' }} />
               </div>
-            </motion.div>
-          )
-        }) : (
-          <p className="text-base text-white/30 py-8 text-center">No drops yet</p>
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate" style={{ color: 'var(--charcoal)' }}>{drop.song.title}</p>
+              <p className="text-sm truncate" style={{ color: 'var(--text-secondary)' }}>{drop.song.artist} · {drop.groupName}</p>
+            </div>
+          </motion.div>
+        )) : (
+          <p className="text-sm py-8 text-center" style={{ color: 'var(--text-muted)' }}>No drops yet</p>
         )}
       </div>
 
       {/* Sign out */}
       <button
         onClick={signOut}
-        className="w-full flex items-center justify-center gap-2 text-base text-red-400/80 hover:text-red-400 py-3 transition-colors"
+        className="w-full flex items-center justify-center gap-2 text-sm py-3 transition-colors"
+        style={{ color: '#C0564A' }}
       >
         <LogOut size={16} />
         Sign Out

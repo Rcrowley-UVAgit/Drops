@@ -44,25 +44,36 @@ export default function SongSearch({ onSelect, onClose }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-[#060606]/95 backdrop-blur-xl z-50 flex flex-col"
+      className="fixed inset-0 backdrop-blur-xl z-50 flex flex-col"
+      style={{ background: 'rgba(255, 252, 246, 0.97)' }}
     >
       {/* Header */}
       <div className="p-5 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">Search Songs</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/[0.06] flex items-center justify-center text-white/50 hover:text-white hover:bg-white/[0.1] transition-all">
+          <h2 className="text-lg font-bold" style={{ color: 'var(--charcoal)', fontFamily: "'Instrument Serif', serif" }}>
+            Search Songs
+          </h2>
+          <button onClick={onClose}
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-all"
+            style={{ background: 'var(--bg-subtle)', color: 'var(--text-muted)' }}>
             <X size={18} />
           </button>
         </div>
         <div className="relative">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2"
+            style={{ color: 'var(--text-muted)' }} />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search any song..."
             autoFocus
-            className="w-full bg-white/[0.06] text-white placeholder-white/30 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-amber-500/30 focus:bg-white/[0.08] text-base transition-all"
+            className="w-full rounded-xl pl-10 pr-4 py-3 outline-none text-sm transition-all"
+            style={{
+              background: 'var(--bg-subtle)',
+              color: 'var(--charcoal)',
+              border: '1px solid var(--border)',
+            }}
           />
         </div>
       </div>
@@ -71,18 +82,19 @@ export default function SongSearch({ onSelect, onClose }) {
       <div className="flex-1 overflow-y-auto px-5 pb-5">
         {loading && (
           <div className="flex justify-center py-12">
-            <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 rounded-full animate-spin"
+              style={{ borderColor: 'var(--border)', borderTopColor: 'var(--terracotta)' }} />
           </div>
         )}
 
         {error && (
-          <div className="text-center py-12 text-red-400 text-base">
+          <div className="text-center py-12 text-red-500 text-sm">
             {error}
           </div>
         )}
 
         {!loading && !error && query && results.length === 0 && (
-          <div className="text-center py-12 text-white/40 text-base">
+          <div className="text-center py-12 text-sm" style={{ color: 'var(--text-muted)' }}>
             No results for "{query}"
           </div>
         )}
@@ -95,20 +107,24 @@ export default function SongSearch({ onSelect, onClose }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.04 }}
               onClick={() => onSelect(song)}
-              className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/[0.06] active:bg-white/[0.08] transition-colors text-left group"
+              className="w-full flex items-center gap-3 p-3 rounded-xl transition-colors text-left group"
+              style={{ '--hover-bg': 'var(--bg-subtle)' }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-subtle)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
             >
               {song.album_art ? (
                 <img src={song.album_art} alt={song.title} className="w-12 h-12 rounded-lg object-cover shadow-lg" />
               ) : (
-                <div className="w-12 h-12 rounded-lg bg-white/[0.04] flex items-center justify-center">
-                  <Music size={20} className="text-white/20" />
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center"
+                  style={{ background: 'var(--bg-subtle)' }}>
+                  <Music size={20} style={{ color: 'var(--text-muted)' }} />
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-base font-medium text-white truncate group-hover:text-amber-400 transition-colors">{song.title}</p>
-                <p className="text-base text-white/60 truncate">{song.artist} · {song.album}</p>
+                <p className="text-sm font-medium truncate" style={{ color: 'var(--charcoal)' }}>{song.title}</p>
+                <p className="text-sm truncate" style={{ color: 'var(--text-secondary)' }}>{song.artist} · {song.album}</p>
               </div>
-              <span className="text-base text-white/40 font-mono shrink-0">
+              <span className="text-sm font-mono shrink-0" style={{ color: 'var(--text-muted)' }}>
                 {song.duration_ms ? formatDuration(song.duration_ms) : ''}
               </span>
             </motion.button>
@@ -116,9 +132,9 @@ export default function SongSearch({ onSelect, onClose }) {
         </AnimatePresence>
 
         {!query && !loading && (
-          <div className="text-center py-16 text-white/30">
-            <Music size={36} className="mx-auto mb-3 text-white/20" />
-            <p className="text-base">Search for a song to drop</p>
+          <div className="text-center py-16" style={{ color: 'var(--text-muted)' }}>
+            <Music size={36} className="mx-auto mb-3" style={{ color: 'var(--border)' }} />
+            <p className="text-sm">Search for a song to drop</p>
           </div>
         )}
       </div>

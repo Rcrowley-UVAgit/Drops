@@ -8,14 +8,12 @@ export default function Vault() {
   const [selectedDrop, setSelectedDrop] = useState(null)
   const [activeGroup, setActiveGroup] = useState('all')
 
-  // Flatten all drops from all groups
   const allDrops = useMemo(() => {
     const drops = []
     for (const [groupId, groupDrops] of Object.entries(demoPastDrops)) {
       const group = demoGroups.find(g => g.id === groupId)
       groupDrops.forEach(d => drops.push({ ...d, groupId, groupName: group?.name }))
     }
-    // Also add today's drop from Fam
     const famGroup = demoGroups.find(g => g.id === 'fam')
     if (famGroup?.today_drop) {
       drops.push({ ...famGroup.today_drop, groupId: 'fam', groupName: 'Fam' })
@@ -34,21 +32,31 @@ export default function Vault() {
   })
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-6 space-y-5">
+    <div className="max-w-2xl mx-auto px-6 py-6 space-y-5"
+      style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">The Vault</h1>
-        <p className="text-base text-white/50 mt-0.5">Every drop, archived</p>
+        <h1 className="text-2xl font-bold tracking-tight"
+          style={{ fontFamily: "'Instrument Serif', serif", color: 'var(--charcoal)' }}>
+          The Vault
+        </h1>
+        <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>Every drop, archived</p>
       </div>
 
       {/* Search */}
       <div className="relative">
-        <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/30" />
+        <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2"
+          style={{ color: 'var(--text-muted)' }} />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search songs, artists, or members..."
-          className="w-full bg-white/[0.04] text-white placeholder-white/30 rounded-xl pl-10 pr-4 py-2.5 outline-none focus:ring-1 focus:ring-amber-500/30 text-base border border-white/[0.06] transition-all"
+          className="w-full rounded-xl pl-10 pr-4 py-2.5 outline-none text-sm transition-all"
+          style={{
+            background: 'var(--bg-subtle)',
+            color: 'var(--charcoal)',
+            border: '1px solid var(--border)',
+          }}
         />
       </div>
 
@@ -74,18 +82,20 @@ export default function Vault() {
             {drop.song.album_art ? (
               <img src={drop.song.album_art} alt="" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-white/[0.04] flex items-center justify-center">
-                <Music size={24} className="text-white/20" />
+              <div className="w-full h-full flex items-center justify-center"
+                style={{ background: 'var(--bg-subtle)' }}>
+                <Music size={24} style={{ color: 'var(--text-muted)' }} />
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-2">
               <div className="min-w-0">
-                <p className="text-base font-semibold text-white truncate">{drop.song.title}</p>
-                <p className="text-base text-white/60 truncate">{drop.song.artist}</p>
+                <p className="text-xs font-semibold text-white truncate">{drop.song.title}</p>
+                <p className="text-xs text-white/60 truncate">{drop.song.artist}</p>
               </div>
             </div>
             {selectedDrop?.id === drop.id && (
-              <div className="absolute inset-0 ring-2 ring-amber-500 rounded-xl" />
+              <div className="absolute inset-0 rounded-xl"
+                style={{ boxShadow: 'inset 0 0 0 2px var(--terracotta)' }} />
             )}
           </motion.button>
         ))}
@@ -98,7 +108,8 @@ export default function Vault() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 12 }}
-            className="bg-[#0f0f0f] rounded-2xl p-5 space-y-3 border border-white/[0.06]"
+            className="rounded-2xl p-5 space-y-3"
+            style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
           >
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
@@ -106,15 +117,16 @@ export default function Vault() {
                   <img src={selectedDrop.song.album_art} alt="" className="w-14 h-14 rounded-lg object-cover shadow-lg" />
                 )}
                 <div className="min-w-0">
-                  <h3 className="font-bold text-white truncate">{selectedDrop.song.title}</h3>
-                  <p className="text-base text-white/60">{selectedDrop.song.artist}</p>
+                  <h3 className="font-bold truncate" style={{ color: 'var(--charcoal)' }}>{selectedDrop.song.title}</h3>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{selectedDrop.song.artist}</p>
                 </div>
               </div>
-              <button onClick={() => setSelectedDrop(null)} className="text-white/30 hover:text-white/60 transition-colors">
+              <button onClick={() => setSelectedDrop(null)}
+                className="transition-colors" style={{ color: 'var(--text-muted)' }}>
                 <X size={16} />
               </button>
             </div>
-            <div className="flex items-center gap-2 text-base text-white/50 flex-wrap">
+            <div className="flex items-center gap-2 text-sm flex-wrap" style={{ color: 'var(--text-secondary)' }}>
               <DropperBadge userId={selectedDrop.user_id} />
               <span>·</span>
               <span>{formatTimeAgo(selectedDrop.submitted_at)}</span>
@@ -126,7 +138,7 @@ export default function Vault() {
               )}
             </div>
             {selectedDrop.caption && (
-              <p className="text-base text-white/70 italic">"{selectedDrop.caption}"</p>
+              <p className="text-sm italic" style={{ color: 'var(--text-secondary)' }}>"{selectedDrop.caption}"</p>
             )}
             <div className="flex items-center gap-2 flex-wrap">
               {selectedDrop.song.spotify_url && (
@@ -134,7 +146,7 @@ export default function Vault() {
                   href={selectedDrop.song.spotify_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-base bg-[#1DB954] text-white px-5 py-2.5 rounded-full font-bold hover:bg-[#17a34a] transition-colors"
+                  className="inline-flex items-center gap-2 text-sm bg-[#1DB954] text-white px-5 py-2.5 rounded-full font-bold hover:bg-[#17a34a] transition-colors"
                 >
                   <ExternalLink size={14} />
                   Spotify
@@ -144,7 +156,7 @@ export default function Vault() {
                 href={`https://music.apple.com/us/search?term=${encodeURIComponent(selectedDrop.song.title + ' ' + selectedDrop.song.artist)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-base bg-[#fc3c44] text-white px-5 py-2.5 rounded-full font-bold hover:bg-[#e0353d] transition-colors"
+                className="inline-flex items-center gap-2 text-sm bg-[#fc3c44] text-white px-5 py-2.5 rounded-full font-bold hover:bg-[#e0353d] transition-colors"
               >
                 <ExternalLink size={14} />
                 Apple Music
@@ -155,7 +167,7 @@ export default function Vault() {
       </AnimatePresence>
 
       {filteredDrops.length === 0 && (
-        <div className="text-center py-16 text-white/30 text-base">
+        <div className="text-center py-16 text-sm" style={{ color: 'var(--text-muted)' }}>
           No drops match your search
         </div>
       )}
@@ -167,11 +179,11 @@ function FilterPill({ label, active, onClick }) {
   return (
     <button
       onClick={onClick}
-      className={`text-base px-3 py-1.5 rounded-full font-medium transition-all ${
-        active
-          ? 'bg-white/[0.1] text-white'
-          : 'bg-white/[0.03] text-white/50 hover:text-white/80 hover:bg-white/[0.06]'
-      }`}
+      className="text-sm px-3 py-1.5 rounded-full font-medium transition-all"
+      style={{
+        background: active ? 'var(--charcoal)' : 'var(--bg-subtle)',
+        color: active ? 'var(--bg)' : 'var(--text-secondary)',
+      }}
     >
       {label}
     </button>
@@ -183,8 +195,8 @@ function DropperBadge({ userId }) {
   return (
     <span className="flex items-center gap-1">
       <span
-        className="w-3.5 h-3.5 rounded-full inline-flex items-center justify-center text-base font-bold"
-        style={{ backgroundColor: user.color, color: '#000' }}
+        className="w-3.5 h-3.5 rounded-full inline-flex items-center justify-center text-xs font-bold"
+        style={{ backgroundColor: user.color, color: '#fff' }}
       >
         {user.display_name[0]}
       </span>
