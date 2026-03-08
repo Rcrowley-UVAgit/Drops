@@ -24,7 +24,7 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
   INSERT INTO public.profiles (id, display_name)
-  VALUES (NEW.id, COALESCE(NEW.raw_user_meta_data->>'display_name', split_part(NEW.email, '@', 1)));
+  VALUES (NEW.id, COALESCE(NULLIF(NEW.raw_user_meta_data->>'display_name', ''), NULLIF(split_part(COALESCE(NEW.email, ''), '@', 1), ''), ''));
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -248,6 +248,62 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- CREATE TRIGGER on_new_drop
 --   AFTER INSERT ON public.drops
 --   FOR EACH ROW EXECUTE FUNCTION public.notify_new_drop();
+
+-- ============================================
+-- Join Group RPC (called from client on sign-up)
+-- ============================================
+CREATE OR REPLACE FUNCTION public.join_group_with_code(
+  p_invite_code TEXT,
+  p_display_name TEXT
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_user_id UUID;
+  v_group_id UUID;
+  v_group_name TEXT;
+  v_cycle_order JSONB;
+BEGIN
+  v_user_id := auth.uid();
+  IF v_user_id IS NULL THEN
+    RETURN jsonb_build_object('error', 'Not authenticated');
+  END IF;
+
+  -- Find group by invite code
+  SELECT id, name, cycle_order INTO v_group_id, v_group_name, v_cycle_order
+  FROM public.groups
+  WHERE invite_code = UPPER(TRIM(p_invite_code));
+
+  IF v_group_id IS NULL THEN
+    RETURN jsonb_build_object('error', 'Invalid invite code');
+  END IF;
+
+  -- Upsert profile with display name
+  INSERT INTO public.profiles (id, display_name)
+  VALUES (v_user_id, TRIM(p_display_name))
+  ON CONFLICT (id) DO UPDATE SET display_name = EXCLUDED.display_name;
+
+  -- Join group (ignore if already a member)
+  INSERT INTO public.group_members (group_id, user_id, role)
+  VALUES (v_group_id, v_user_id, 'member')
+  ON CONFLICT (group_id, user_id) DO NOTHING;
+
+  -- Add to cycle_order if not already present
+  IF NOT (v_cycle_order @> to_jsonb(v_user_id::text)) THEN
+    UPDATE public.groups
+    SET cycle_order = cycle_order || to_jsonb(v_user_id::text)
+    WHERE id = v_group_id;
+  END IF;
+
+  RETURN jsonb_build_object(
+    'user_id', v_user_id,
+    'group_id', v_group_id,
+    'group_name', v_group_name
+  );
+END;
+$$;
 
 -- ============================================
 -- Seed Data: UW Lads group

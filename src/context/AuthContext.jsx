@@ -18,48 +18,24 @@ export function AuthProvider({ children }) {
       if (mounted) setLoading(false)
     }, 3000)
 
-    // Try to restore session — but don't block on it
-    supabase.auth.getSession()
-      .then(async ({ data: { session } }) => {
-        if (!mounted || !session?.user) {
-          if (mounted) setLoading(false)
-          return
-        }
-        const { data: profile } = await fetchProfile(session.user.id)
-        if (!mounted) return
-        if (profile) {
-          setUser({
-            id: session.user.id,
-            display_name: profile.display_name,
-            color: profile.color || '#BF6B4A',
-          })
-          initPushNotifications(session.user.id)
-        } else {
-          await supabase.auth.signOut()
-        }
-        setLoading(false)
-      })
-      .catch(() => {
-        if (mounted) setLoading(false)
-      })
-
-    // Listen for future auth changes (sign in, sign out)
-    // Use { _suppressGetSession: true } to prevent internal getSession call
+    // Single listener handles both initial session and future changes
+    // This avoids lock contention from calling getSession() separately
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted || joiningRef.current) return
-
-      // Only react to actual sign-in/sign-out events, not INITIAL_SESSION
-      if (event === 'INITIAL_SESSION') return
 
       if (session?.user) {
         try {
           const { data: profile } = await fetchProfile(session.user.id)
-          if (mounted && profile) {
+          if (!mounted) return
+          if (profile) {
             setUser({
               id: session.user.id,
               display_name: profile.display_name,
               color: profile.color || '#BF6B4A',
             })
+          } else if (event === 'INITIAL_SESSION') {
+            // No profile found for existing session — stale anonymous user
+            await supabase.auth.signOut()
           }
         } catch (err) {
           console.error('Auth state change error:', err)
@@ -67,6 +43,8 @@ export function AuthProvider({ children }) {
       } else {
         if (mounted) setUser(null)
       }
+
+      if (mounted) setLoading(false)
     })
 
     return () => {

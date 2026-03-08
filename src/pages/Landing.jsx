@@ -15,8 +15,18 @@ export default function Landing() {
     if (!name.trim() || !code.trim()) return
     setLoading(true)
     setError('')
-    const { error: authError } = await signInWithCode(code, name)
-    if (authError) setError(authError.message)
+    try {
+      const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Request timed out. Please try again.')), 15000)
+      )
+      const { error: authError } = await Promise.race([
+        signInWithCode(code, name),
+        timeout,
+      ])
+      if (authError) setError(authError.message || 'Something went wrong.')
+    } catch (err) {
+      setError(err.message || 'Something went wrong.')
+    }
     setLoading(false)
   }
 

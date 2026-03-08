@@ -3,15 +3,38 @@ import { supabase } from './supabase'
 // ─── Auth & Onboarding ───────────────────────────────────────
 
 export async function joinWithCode(inviteCode, displayName) {
+  console.log('[JOIN] Starting joinWithCode...')
+
   // 1. Sign in anonymously
-  const { data: authData, error: authErr } = await supabase.auth.signInAnonymously()
+  let authData, authErr
+  try {
+    console.log('[JOIN] Calling signInAnonymously...')
+    const result = await supabase.auth.signInAnonymously()
+    console.log('[JOIN] signInAnonymously result:', result.error ? 'ERROR: ' + result.error.message : 'OK')
+    authData = result.data
+    authErr = result.error
+  } catch (e) {
+    console.error('[JOIN] signInAnonymously threw:', e)
+    return { error: { message: e.message || 'Failed to connect. Check your internet connection.' } }
+  }
   if (authErr) return { error: authErr }
 
   // 2. Call server-side function that handles profile + group join (bypasses RLS)
-  const { data, error } = await supabase.rpc('join_group_with_code', {
-    p_invite_code: inviteCode,
-    p_display_name: displayName,
-  })
+  let data, error
+  try {
+    console.log('[JOIN] Calling RPC join_group_with_code...')
+    const result = await supabase.rpc('join_group_with_code', {
+      p_invite_code: inviteCode,
+      p_display_name: displayName,
+    })
+    console.log('[JOIN] RPC result:', result.error ? 'ERROR: ' + result.error.message : 'OK', result.data)
+    data = result.data
+    error = result.error
+  } catch (e) {
+    console.error('[JOIN] RPC threw:', e)
+    await supabase.auth.signOut()
+    return { error: { message: e.message || 'Failed to join group.' } }
+  }
 
   if (error) {
     await supabase.auth.signOut()
