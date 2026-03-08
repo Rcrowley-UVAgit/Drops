@@ -1,7 +1,8 @@
 const CACHE_NAME = 'revinyl-v1'
 
 // Assets to pre-cache on install
-const PRECACHE = ['/', '/index.html']
+const BASE = '/Drops'
+const PRECACHE = [BASE + '/', BASE + '/index.html']
 
 // Install: cache app shell
 self.addEventListener('install', (event) => {
@@ -34,13 +35,13 @@ self.addEventListener('fetch', (event) => {
   // Navigation requests: network-first, fallback to cached /index.html (SPA)
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match('/index.html'))
+      fetch(event.request).catch(() => caches.match(BASE + '/index.html'))
     )
     return
   }
 
   // Static assets: cache-first
-  if (url.pathname.startsWith('/assets/') || url.pathname.startsWith('/icons/')) {
+  if (url.pathname.includes('/assets/') || url.pathname.includes('/icons/')) {
     event.respondWith(
       caches.match(event.request).then((cached) => {
         if (cached) return cached
@@ -61,8 +62,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || 'ReVinyl'
   const options = {
     body: data.body || '',
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
+    icon: '/Drops/icons/icon-192.png',
+    badge: '/Drops/icons/icon-192.png',
     data: { url: data.url || '/' },
   }
   event.waitUntil(self.registration.showNotification(title, options))

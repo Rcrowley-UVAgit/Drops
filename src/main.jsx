@@ -6,6 +6,6 @@ createRoot(document.getElementById('root')).render(<App />)
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('/Drops/sw.js')
   })
 }

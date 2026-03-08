@@ -5,12 +5,16 @@
     <title>ReVinyl</title>
     <script>
       // SPA redirect for GitHub Pages
-      // Converts the path to a query string so index.html can restore it
+      // Strips the base path (/Drops) and passes the rest as a query param
+      var basePath = '/Drops';
       var path = window.location.pathname;
+      if (path.startsWith(basePath)) {
+        path = path.slice(basePath.length) || '/';
+      }
       var search = window.location.search;
       var hash = window.location.hash;
       window.location.replace(
-        window.location.origin + '/?p=' + encodeURIComponent(path + search + hash)
+        window.location.origin + basePath + '/?p=' + encodeURIComponent(path + search + hash)
       );
     </script>
   </head>
