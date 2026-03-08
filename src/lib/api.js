@@ -42,16 +42,25 @@ export async function joinWithCode(inviteCode, displayName) {
     // Non-fatal — continue with join
   }
 
-  // 4. Join the group
+  // 4. Join the group (check if already a member first)
   console.log('[JOIN] joining group...')
-  const { error: memberErr } = await supabase
+  const { data: existing } = await supabase
     .from('group_members')
-    .upsert({ group_id: group.id, user_id: userId, role: 'member' }, { onConflict: 'group_id,user_id' })
+    .select('id')
+    .eq('group_id', group.id)
+    .eq('user_id', userId)
+    .maybeSingle()
 
-  if (memberErr) {
-    console.error('[JOIN] member insert error:', memberErr.message)
-    await supabase.auth.signOut()
-    return { error: memberErr }
+  if (!existing) {
+    const { error: memberErr } = await supabase
+      .from('group_members')
+      .insert({ group_id: group.id, user_id: userId, role: 'member' })
+
+    if (memberErr) {
+      console.error('[JOIN] member insert error:', memberErr.message)
+      await supabase.auth.signOut()
+      return { error: memberErr }
+    }
   }
 
   // 5. Add to cycle_order if not already present
